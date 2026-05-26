@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+env/
+
+.streamlit/secrets.toml
+.env
+*.log
+
+.pytest_cache/
+.mypy_cache/
+
+chroma/
+chroma_db/
+.chroma/
