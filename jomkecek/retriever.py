@@ -3,10 +3,24 @@ from __future__ import annotations
 import math
 from collections import Counter
 
-from .config import DEFAULT_TOP_K, LOW_RETRIEVAL_CONFIDENCE, USE_CHROMA
+from .config import DEFAULT_TOP_K, EMBED_MODEL, LOW_RETRIEVAL_CONFIDENCE, USE_CHROMA
 from .data import load_documents
 from .models import RagDocument, RetrievalHit
 from .preprocessing import tokenize
+
+# Cached embedding function — loaded once on first ChromaDB query.
+_embed_fn = None
+
+
+def _get_embed_fn():
+    global _embed_fn
+    if _embed_fn is None:
+        try:
+            import chromadb.utils.embedding_functions as ef
+            _embed_fn = ef.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
+        except Exception:
+            pass
+    return _embed_fn
 
 
 def collections_for_query(query: str) -> set[str]:
@@ -73,8 +87,6 @@ def _lexical_hits(query: str, collections: set[str], top_k: int) -> list[Retriev
     hits = []
     for score, doc in raw[:top_k]:
         normalized = score / max_score
-        # Without Chroma, lexical score fills both channels. The formula still
-        # matches the hybrid design and can accept vector_score later.
         hits.append(RetrievalHit(round(normalized, 3), doc, round(normalized, 3), round(normalized, 3)))
     return hits
 
@@ -87,17 +99,22 @@ def _chroma_hits(query: str, collections: set[str], top_k: int) -> list[Retrieva
     except Exception:
         return []
 
-    from .config import CHROMA_PATH
+    embed_fn = _get_embed_fn()
+    if embed_fn is None:
+        return []
 
-    # Chroma usage is intentionally optional. For production, build separate
-    # collections named dialect_words, dialect_sentences, tourism, food, culture.
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    from .config import CHROMA_PATH
+    try:
+        client = chromadb.PersistentClient(path=CHROMA_PATH)
+    except Exception:
+        return []
+
     hits: list[RetrievalHit] = []
     docs_by_id = {f"{doc.collection}:{doc.row}": doc for doc in load_documents()}
 
     for collection in collections:
         try:
-            col = client.get_collection(collection)
+            col = client.get_collection(collection, embedding_function=embed_fn)
             result = col.query(query_texts=[query], n_results=top_k)
         except Exception:
             continue
@@ -107,6 +124,7 @@ def _chroma_hits(query: str, collections: set[str], top_k: int) -> list[Retrieva
             doc = docs_by_id.get(doc_id)
             if not doc:
                 continue
+            # Cosine distance: 0 = identical, 1 = orthogonal → convert to similarity
             vector_score = max(0.0, 1.0 - float(distance))
             hits.append(RetrievalHit(vector_score, doc, 0.0, round(vector_score, 3)))
     return hits

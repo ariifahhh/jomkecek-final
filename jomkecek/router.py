@@ -23,6 +23,27 @@ DIALECT_WORDS = {
     "takdih",
 }
 
+# Topics that require live LLM knowledge — not answerable from a static dataset.
+# Queries hitting these tokens (with a Kelantan signal) skip RAG entirely and go
+# straight to the LLM so answers stay up-to-date.
+DYNAMIC_TOPICS = frozenset({
+    "sultan",
+    "menteri",
+    "mb",
+    "ekonomi",
+    "kerajaan",
+    "politik",
+    "penduduk",
+    "populasi",
+    "cuaca",
+    "banjir",
+    "monsun",
+})
+
+
+def _is_dynamic_topic(tokens: set[str]) -> bool:
+    return bool(tokens & DYNAMIC_TOPICS)
+
 
 def _intent_and_collections(normalized: str) -> tuple[str, list[str]]:
     tokens = set(tokenize(normalized))
@@ -34,16 +55,15 @@ def _intent_and_collections(normalized: str) -> tuple[str, list[str]]:
         return "culture", ["culture"]
     if {"tempat", "menarik", "pantai", "pasar", "muzium", "pelancongan"} & tokens:
         return "tourism", ["tourism"]
-    if {"jajahan", "ibu", "negeri", "sungai", "bendera", "gelaran", "sultan", "muhammad"} & tokens:
+    if {"jajahan", "ibu", "negeri", "sungai", "bendera", "gelaran", "lokasi"} & tokens:
         return "general_fact", ["canonical_facts", "qa_umum_kelantan"]
-    if {"cuaca", "monsun", "banjir", "hujan"} & tokens:
-        return "geography", ["qa_umum_kelantan"]
     return "unknown", ["qa_umum_kelantan", "tourism", "food", "culture"]
 
 
 def route_query(query: str, selected_mode: str = "Auto") -> dict:
     normalized = normalize_query(query)
     tokens = tokenize(normalized)
+    token_set = set(tokens)
     dialect_count = sum(1 for token in tokens if token in DIALECT_WORDS)
 
     if detect_out_of_scope(normalized):
@@ -63,6 +83,14 @@ def route_query(query: str, selected_mode: str = "Auto") -> dict:
         }
 
     if selected_mode == "Info Kelantan":
+        # Even in explicit Info mode, dynamic topics go to LLM knowledge
+        if _is_dynamic_topic(token_set):
+            return {
+                "mode": "llm_knowledge",
+                "intent": "dynamic",
+                "normalized_query": normalized,
+                "collection_filter": [],
+            }
         intent, collections = _intent_and_collections(normalized)
         return {
             "mode": "general_qa",
@@ -80,11 +108,20 @@ def route_query(query: str, selected_mode: str = "Auto") -> dict:
             "collection_filter": ["dialect_words", "dialect_phrases", "dialect_sentences"],
         }
 
+    kelantan_signal = "kelantan" in normalized
+    if kelantan_signal and _is_dynamic_topic(token_set):
+        return {
+            "mode": "llm_knowledge",
+            "intent": "dynamic",
+            "normalized_query": normalized,
+            "collection_filter": [],
+        }
+
     intent, collections = _intent_and_collections(normalized)
-    kelantan_signal = "kelantan" in normalized or intent != "unknown"
+    has_kelantan = kelantan_signal or intent != "unknown"
     return {
-        "mode": "general_qa" if kelantan_signal else "dialect_translation",
-        "intent": intent if kelantan_signal else "unknown",
+        "mode": "general_qa" if has_kelantan else "dialect_translation",
+        "intent": intent if has_kelantan else "unknown",
         "normalized_query": normalized,
-        "collection_filter": collections if kelantan_signal else ["dialect_words"],
+        "collection_filter": collections if has_kelantan else ["dialect_words"],
     }

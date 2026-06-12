@@ -5,13 +5,26 @@ __pycache__/
 venv/
 env/
 
-.streamlit/secrets.toml
 .env
 *.log
 
 .pytest_cache/
 .mypy_cache/
 
+# ChromaDB vector index (rebuild with setup_chroma.py)
 chroma/
 chroma_db/
+chroma_db_jomkecek/
 .chroma/
+
+# GGUF model files (too large for GitHub, download via HuggingFace)
+models/
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# OS
+.DS_Store
+Thumbs.db

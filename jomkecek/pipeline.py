@@ -36,7 +36,7 @@ def expand_query_for_detail(query: str) -> str:
     if {"cuaca", "monsun", "banjir", "hujan"} & tokens:
         expansions.append("cuaca monsun hujan banjir sungai kelantan")
     if "sultan" in tokens:
-        expansions.append("Sultan Muhammad V Kelantan sejarah istana budaya diraja")
+        expansions.append("Sultan Kelantan sejarah istana budaya diraja")
     if "budaya" in tokens:
         expansions.append("budaya Kelantan seni tradisi permainan kraftangan")
     return " ".join(dict.fromkeys(expansions))
@@ -45,32 +45,6 @@ def expand_query_for_detail(query: str) -> str:
 def _collections_from_route(route: dict[str, Any]) -> set[str] | None:
     mapped = {c for c in route.get("collection_filter", []) if c in {"tourism", "food", "culture"}}
     return mapped or None
-
-
-def lookup_canonical_or_current_fact(query: str) -> dict[str, Any] | None:
-    canonical = lookup_canonical_fact(query)
-    if canonical:
-        return canonical
-    q = query.lower()
-    if "sultan" in q:
-        return {
-            "intent": "sultan_kelantan",
-            "answer": (
-                "Jawapan:\nSultan Kelantan yang lazim dirujuk dalam pengetahuan umum ialah Sultan Muhammad V.\n\n"
-                "Maklumat ringkas:\nUntuk maklumat rasmi terkini, semak portal rasmi kerajaan negeri atau istana."
-            ),
-            "source": "canonical_facts",
-        }
-    if re.search(r"\bmb\b", q) or "menteri besar" in q:
-        return {
-            "intent": "menteri_besar_semasa",
-            "answer": (
-                "Jawapan:\nMaklumat Menteri Besar ialah maklumat semasa yang boleh berubah.\n\n"
-                "Maklumat ringkas:\nSila semak portal rasmi Kerajaan Negeri Kelantan untuk nama terkini."
-            ),
-            "source": "canonical_facts",
-        }
-    return None
 
 
 def _shorten(text: str, limit: int = 230) -> str:
@@ -181,10 +155,6 @@ def validate_rag_context(route: dict[str, Any], hits, answer_type: str = "direct
     return True
 
 
-def retrieve_rag_context(query: str):
-    return retrieve(query)
-
-
 def retrieve_expanded_context(query: str, intent: str, answer_type: str, route: dict[str, Any]):
     top_k = 12 if answer_type in {"reasoning", "detail"} else 6
     expanded = expand_query_for_detail(query) if answer_type in {"reasoning", "detail"} else query
@@ -276,12 +246,40 @@ Arahan:
         return WEAK_RAG_MESSAGE
 
 
+def answer_with_llm_knowledge(query: str) -> dict[str, Any]:
+    """Direct LLM answer for dynamic/current-events topics — no RAG retrieval."""
+    prompt = f"""{GENERAL_KELANTAN_PROMPT}
+
+Soalan berkaitan Kelantan:
+{query}
+
+Arahan tambahan:
+- Jawab berdasarkan pengetahuan umum tentang Kelantan.
+- Jika maklumat bersifat semasa (pemimpin semasa, cuaca terkini, perangkaan terbaru), nyatakan bahawa maklumat mungkin telah berubah dan cadangkan pengguna semak sumber rasmi.
+- Jawab dalam Bahasa Melayu, ringkas dan tepat.
+"""
+    try:
+        answer = ollama_generate(prompt, temperature=0.3)
+    except Exception:
+        answer = "Maaf, tidak dapat mendapatkan maklumat buat masa ini. Sila semak sumber rasmi."
+
+    return {
+        "response_type": "llm_knowledge",
+        "summary": answer,
+        "items": [],
+        "sections": [],
+        "llm_note": answer,
+        "used_llm": True,
+    }
+
+
 def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -> dict[str, Any]:
-    known = lookup_canonical_or_current_fact(query)
+    # Static canonical facts (ibu negeri, jajahan count, gelaran, etc.)
+    known = lookup_canonical_fact(query)
     if known:
         summary = known["answer"]
-        if answer_type == "detail" and "Sultan Muhammad V" in summary:
-            summary += "\n\nMaklumat lanjut:\nMaklumat yang tersedia dalam JomKecek adalah terhad kepada fakta asas ini."
+        if answer_type == "detail":
+            summary += "\n\nMaklumat lanjut:\nMaklumat yang tersedia dalam JomKecek adalah berdasarkan rekod yang telah disahkan."
         return {
             "response_type": "fact",
             "summary": summary,
@@ -374,7 +372,7 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
     answer_type = detect_answer_type(route["normalized_query"])
 
     if route["mode"] == "out_of_scope":
-        result = {
+        return {
             "intent": "out_of_scope",
             "mode": "Luar Skop",
             "translation": {},
@@ -385,7 +383,23 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
             "visual_keywords": [],
             "route": route,
         }
-        return result
+
+    # Dynamic topics — bypass RAG, use LLM parametric knowledge directly
+    if route["mode"] == "llm_knowledge":
+        kelantan = answer_with_llm_knowledge(route["normalized_query"])
+        answer = final_response_guard(kelantan["summary"])
+        return {
+            "intent": "kelantan",
+            "mode": "Info Kelantan",
+            "translation": {},
+            "kelantan": kelantan,
+            "answer": answer,
+            "eval": evaluate(answer, [], 0.9, False),
+            "contexts": [],
+            "visual_keywords": [],
+            "route": route,
+            "answer_type": answer_type,
+        }
 
     intent = "translation" if route["mode"] == "dialect_translation" else "kelantan"
     hits = [] if intent == "translation" else retrieve_expanded_context(
@@ -419,7 +433,13 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
     result.update(
         {
             "answer": answer,
-            "eval": evaluate(answer, context_texts, max(confidence, LOW_RETRIEVAL_CONFIDENCE if hits else 0), strict),
+            "eval": evaluate(
+                answer,
+                context_texts,
+                max(confidence, LOW_RETRIEVAL_CONFIDENCE if hits else 0),
+                strict,
+                question=route["normalized_query"],
+            ),
             "contexts": [
                 {
                     "score": hit.score,

@@ -1,6 +1,11 @@
 # JomKecek Hybrid Chatbot
 
-JomKecek is a controlled hybrid Streamlit chatbot for Kelantan dialect translation, tourism, culture, food and general Kelantan questions.
+JomKecek is a controlled hybrid chatbot for Kelantan dialect translation, tourism, culture, food and general Kelantan questions.
+
+The project now supports two interfaces:
+
+- FastAPI + React/Next.js web app for the final-year-project style presentation.
+- Streamlit UI retained as a quick local demo.
 
 ## Architecture
 
@@ -46,6 +51,8 @@ JomKecek only answers about Kelantan. Questions about other states or countries 
 ## Folder Structure
 
 ```text
+api.py                  FastAPI JSON API
+frontend/               React/Next.js frontend
 app.py                  Streamlit UI
 backend.py              Small compatibility facade
 jomkecek/
@@ -61,10 +68,34 @@ jomkecek/
   chroma_index.py       Optional separate Chroma collection builder
 ```
 
-## Run
+## Run FastAPI + Next.js
 
 ```powershell
-cd "C:\Users\masar\Desktop\FYP SEM 2\FYP SEM 2\CODE TRY BARU DARI COLAB"
+cd "C:\Users\masar\Desktop\FYP SEM 2\FYP SEM 2\CODE TRY BARU DARI COLAB - Copy - Copy"
+.\run_webapp.ps1
+```
+
+Then open:
+
+- Frontend: `http://127.0.0.1:3000`
+- API docs: `http://127.0.0.1:8000/docs`
+
+Manual run:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m uvicorn api:app --host 127.0.0.1 --port 8000
+
+cd frontend
+npm install
+$env:NEXT_PUBLIC_API_BASE_URL="http://127.0.0.1:8000"
+npm run dev -- -p 3000
+```
+
+## Run Streamlit
+
+```powershell
+cd "C:\Users\masar\Desktop\FYP SEM 2\FYP SEM 2\CODE TRY BARU DARI COLAB - Copy - Copy"
 & "C:\Users\masar\AppData\Local\Programs\Python\Python312\python.exe" -m streamlit run app.py --server.port 8501
 ```
 
