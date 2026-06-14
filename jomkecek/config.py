@@ -8,8 +8,8 @@ DATA_PATHS = (
 )
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-MODEL_NAME = os.getenv("JOMKECEK_MODEL", "malaysian-qwen2.5:7b")
-JUDGE_MODEL_NAME = os.getenv("JOMKECEK_JUDGE_MODEL", "qwen2.5:3b")
+MODEL_NAME = os.getenv("JOMKECEK_MODEL", "qwen2.5:7b")
+JUDGE_MODEL_NAME = os.getenv("JOMKECEK_JUDGE_MODEL", "qwen2.5:7b")
 
 USE_CHROMA = os.getenv("JOMKECEK_USE_CHROMA", "1") == "1"
 CHROMA_PATH = os.getenv("JOMKECEK_CHROMA_PATH", "./chroma_db_jomkecek")

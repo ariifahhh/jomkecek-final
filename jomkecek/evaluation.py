@@ -9,18 +9,18 @@ try:
 except Exception:
     rouge_scorer = None
 
-_LLM_JUDGE_PROMPT = """Kau adalah hakim AI yang menilai kualiti jawapan chatbot Kelantan.
+_LLM_JUDGE_PROMPT = """You are an evaluation AI for a Kelantan chatbot. Score the response below.
 
-Soalan pengguna: {question}
-Konteks yang diambil daripada pangkalan data: {context}
-Jawapan chatbot: {answer}
+Question: {question}
+Context from database: {context}
+Chatbot answer: {answer}
 
-Nilai setiap aspek dengan skor 0.0 hingga 1.0:
-- Faithfulness: Adakah jawapan berdasarkan konteks yang diberikan? (1.0 = sepenuhnya berdasarkan konteks, tiada fakta rekaan)
-- Relevancy: Adakah jawapan menjawab soalan pengguna? (1.0 = sangat relevan dan tepat)
-- Completeness: Adakah jawapan lengkap dan tidak terpotong? (1.0 = lengkap)
+Rate each dimension 0.0 to 1.0:
+FAITHFULNESS: Is answer grounded in context? (1.0=fully grounded, 0.0=hallucinated)
+RELEVANCY: Does it answer the question? (1.0=very relevant, 0.0=off-topic)
+COMPLETENESS: Is answer complete? (1.0=complete, 0.0=empty/cut off)
 
-Balas HANYA dalam format ini, tiada penjelasan lain:
+Output ONLY this line, nothing else:
 FAITHFULNESS=0.X|RELEVANCY=0.X|COMPLETENESS=0.X"""
 
 

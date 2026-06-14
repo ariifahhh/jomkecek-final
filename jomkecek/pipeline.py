@@ -3,9 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from .canonical import lookup_canonical_fact
 from .config import LOW_RETRIEVAL_CONFIDENCE, MODEL_NAME
-from .data import TOURISM_SEEDS, active_data_path, load_documents
+from .data import active_data_path, load_documents
 from .dialect import translate_dialect
 from .evaluation import evaluate
 from .guards import OUT_OF_SCOPE_MESSAGE, WEAK_RAG_MESSAGE, final_response_guard
@@ -15,11 +14,34 @@ from .router import route_query
 from .preprocessing import tokenize
 
 
+def _get_dialect_examples(matched_words: list[str]) -> tuple[list[dict], list]:
+    """Retrieve example sentences from contoh_ayat sheet for the matched dialect words.
+    Returns (examples, raw_hits) so hits can be used for evaluation context."""
+    if not matched_words:
+        return [], []
+    query = " ".join(matched_words[:4])
+    hits = retrieve(query, top_k=4, collections={"dialect_sentences"})
+    examples = []
+    for hit in hits[:3]:
+        meta = hit.document.metadata
+        dialek = (
+            meta.get("dialek_ayat") or meta.get("dialek") or meta.get("ayat_dialek") or
+            meta.get("contoh") or meta.get("ayat") or ""
+        )
+        bm = (
+            meta.get("bm_ayat") or meta.get("bm") or meta.get("terjemahan") or
+            meta.get("ayat_bm") or meta.get("maksud") or ""
+        )
+        if dialek:
+            examples.append({"dialek": dialek, "bm": bm})
+    return examples, hits
+
+
 def detect_answer_type(query: str) -> str:
     q = query.lower()
     if any(term in q for term in ("mengapakah", "bagaimanakah", "kenapa", "bagaimana", "pada pendapat anda")):
         return "reasoning"
-    if any(term in q for term in ("maklumat lanjut", "terangkan", "huraikan", "jelaskan")):
+    if any(term in q for term in ("maklumat lanjut", "terangkan", "huraikan", "jelaskan", "ceritakan", "bercerita", "kongsikan")):
         return "detail"
     if any(term in q for term in ("cadangkan", "tempat menarik", "makanan", "aktiviti", "pantai popular")):
         return "recommendation"
@@ -81,23 +103,7 @@ def _item_from_doc(hit) -> dict[str, Any]:
     }
 
 
-def _kota_bharu_defaults() -> list[dict[str, Any]]:
-    return [
-        {
-            "name": seed["nama"],
-            "district": seed["daerah"],
-            "category": seed["kategori"],
-            "description": seed["deskripsi"],
-            "confidence": 0.95,
-        }
-        for seed in TOURISM_SEEDS
-    ]
-
-
 def build_tourism_items(query: str, hits) -> list[dict[str, Any]]:
-    if "tempat" in query.lower() and "kota bharu" in query.lower():
-        return _kota_bharu_defaults()
-
     seen = set()
     items = []
     for hit in hits:
@@ -163,6 +169,95 @@ def retrieve_expanded_context(query: str, intent: str, answer_type: str, route: 
     return valid
 
 
+_CANONICAL_KELANTAN: dict[str, str] = {
+    "gelaran": (
+        "Kelantan dikenali dengan gelaran 'Serambi Mekah' kerana kedudukannya sebagai pusat "
+        "pengajian Islam yang kuat di Malaysia, dengan majoriti penduduknya beragama Islam dan "
+        "banyak institusi agama Islam terkenal."
+    ),
+    "serambi mekah": (
+        "Gelaran 'Serambi Mekah' diberikan kepada Kelantan kerana negeri ini diiktiraf sebagai "
+        "pusat kehidupan dan pengajian Islam yang kukuh di Malaysia."
+    ),
+    "ibu negeri": "Ibu negeri Kelantan ialah Kota Bharu.",
+    "jajahan": (
+        "Kelantan mempunyai 10 jajahan: Kota Bharu, Pasir Mas, Tumpat, Pasir Puteh, Bachok, "
+        "Kuala Krai, Machang, Tanah Merah, Jeli dan Gua Musang."
+    ),
+    "berapa jajahan": (
+        "Kelantan mempunyai 10 jajahan: Kota Bharu, Pasir Mas, Tumpat, Pasir Puteh, Bachok, "
+        "Kuala Krai, Machang, Tanah Merah, Jeli dan Gua Musang."
+    ),
+    "bendera": (
+        "Bendera Kelantan berwarna merah jambu (fuchsia) dengan gambar wau bulan berwarna putih "
+        "di bahagian tengah."
+    ),
+    "luas": "Kelantan berkeluasan 15,099 kilometer persegi.",
+    "sempadan": (
+        "Kelantan bersempadan dengan negeri Terengganu di timur, Perak di barat, Pahang di selatan, "
+        "dan Thailand di utara."
+    ),
+    "sungai": "Sungai Kelantan merupakan sungai utama yang mengalir melalui negeri Kelantan ke Laut China Selatan.",
+    "penduduk": (
+        "Penduduk Kelantan adalah lebih kurang 1.8 juta orang (anggaran). Sila semak sumber rasmi "
+        "seperti Jabatan Perangkaan Malaysia untuk angka terkini."
+    ),
+    "lapangan terbang": (
+        "Lapangan terbang utama di Kelantan ialah Lapangan Terbang Sultan Ismail Petra (IATA: KBR), "
+        "terletak di Pengkalan Chepa, Kota Bharu."
+    ),
+    "airport": (
+        "Lapangan terbang utama di Kelantan ialah Lapangan Terbang Sultan Ismail Petra (IATA: KBR), "
+        "terletak di Pengkalan Chepa, Kota Bharu."
+    ),
+    "masjid ikonik": (
+        "Masjid ikonik di Kota Bharu ialah Masjid Muhammadi, iaitu masjid negeri Kelantan yang "
+        "dibina pada tahun 1867 dan mempunyai seni bina yang unik."
+    ),
+    "masjid negeri": (
+        "Masjid negeri Kelantan ialah Masjid Muhammadi di Kota Bharu."
+    ),
+    "stadium": (
+        "Stadium utama di Kota Bharu ialah Stadium Sultan Muhammad IV, yang merupakan stadium "
+        "utama bagi pasukan bola sepak Kelantan FA."
+    ),
+    "tanah tinggi": (
+        "Kawasan tanah tinggi di Kelantan termasuk kawasan sekitar Gua Musang dan hutan di selatan "
+        "Kelantan yang bersempadan dengan Cameron Highlands, Pahang."
+    ),
+    "gua": (
+        "Antara gua terkenal di Kelantan ialah kawasan Gua Musang dan Gua Ikan di Kuala Krai. "
+        "Kelantan juga mempunyai pelbagai gua lain dalam hutan simpannya."
+    ),
+    "kraftangan": (
+        "Kraftangan tradisional Kelantan yang terkenal termasuk songket (kain benang emas), "
+        "batik kelantan, wau bulan, gasing, dan anyaman mengkuang."
+    ),
+    "songket": (
+        "Songket ialah kraftangan tradisional Kelantan yang menggunakan benang emas atau perak "
+        "ditenun bersama kain sutera atau kapas, menghasilkan corak yang mewah dan indah."
+    ),
+    "wayang kulit": (
+        "Wayang Kulit Kelantan ialah seni persembahan tradisional yang menggunakan patung kulit "
+        "lembu yang diukir halus, dipersembahkan dalam cerita epik Ramayana dan Mahabharata."
+    ),
+    "gasing": (
+        "Permainan gasing adalah permainan tradisional yang sangat terkenal di Kelantan. "
+        "Gasing Kelantan adalah antara yang terbesar di dunia dan boleh berputar sehingga berjam-jam."
+    ),
+}
+
+
+def _check_canonical(query: str) -> str | None:
+    q = query.lower()
+    # Check multi-word keys first (more specific), then single-word keys
+    sorted_keys = sorted(_CANONICAL_KELANTAN.keys(), key=len, reverse=True)
+    for key in sorted_keys:
+        if key in q:
+            return _CANONICAL_KELANTAN[key]
+    return None
+
+
 def _context_lines(hits, limit: int = 5) -> list[str]:
     lines = []
     for hit in hits[:limit]:
@@ -191,38 +286,34 @@ def generate_answer_by_type(query: str, hits, route: dict[str, Any], answer_type
             lines.append(f"{i}. {item['name']}\n{item['description']}")
         return "\n\n".join(lines)
 
-    if answer_type == "detail":
+    if answer_type in {"detail", "reasoning"}:
         points = _context_lines(hits, 5)
-        if points:
-            return (
-                "Jawapan ringkas:\n"
-                f"{cautious}{points[0]}.\n\n"
-                "Maklumat lanjut:\n"
-                + "\n".join(f"{i}. {point}" for i, point in enumerate(points[:5], start=1))
-                + "\n\nKesimpulan:\nMaklumat lanjut yang tersedia adalah berdasarkan rekod berkaitan dalam pangkalan data JomKecek."
-            )
+        context_for_llm = "\n".join(points) if points else context
+        detail_prompt = f"""{GENERAL_KELANTAN_PROMPT}
 
-    if answer_type == "reasoning":
-        points = _context_lines(hits, 5)
-        if points:
-            reasons = points[:3]
-            lines = [
-                "Jawapan:",
-                "Perkara ini boleh dijelaskan melalui beberapa sebab:",
-                "",
-            ]
-            for i, point in enumerate(reasons, start=1):
-                name, _, desc = point.partition(":")
-                lines.append(f"{i}. {name.strip()}")
-                lines.append(desc.strip() or "Maklumat ini berkaitan dengan rekod dalam pangkalan data JomKecek.")
-                lines.append("")
-            lines.extend(
-                [
-                    "Kesimpulan:",
-                    "Berdasarkan maklumat berkaitan dalam pangkalan data JomKecek, jawapan ini disusun daripada konteks yang sepadan dengan topik soalan.",
-                ]
-            )
-            return "\n".join(lines)
+Konteks dari pangkalan data JomKecek:
+{context_for_llm}
+
+Soalan: {query}
+
+Arahan:
+- Jawab dalam Bahasa Melayu yang natural dan informatif.
+- Gunakan maklumat dari konteks di atas sebagai asas jawapan.
+- Berikan penerangan yang lengkap dan terperinci.
+- Jangan tambah fakta yang tiada dalam konteks.
+- Struktur: mulakan dengan jawapan ringkas, kemudian huraikan dengan lebih lanjut.
+"""
+        try:
+            return ollama_generate(detail_prompt, temperature=0.3)
+        except Exception:
+            if points:
+                return (
+                    "Jawapan ringkas:\n"
+                    f"{cautious}{points[0]}.\n\n"
+                    "Maklumat lanjut:\n"
+                    + "\n".join(f"{i}. {point}" for i, point in enumerate(points[:5], start=1))
+                )
+            return WEAK_RAG_MESSAGE
 
     prompt = f"""{GENERAL_KELANTAN_PROMPT}
 
@@ -232,13 +323,10 @@ Konteks RAG:
 Soalan:
 {query}
 
-Jenis jawapan: {answer_type}
-
 Arahan:
 - Jawab dalam Bahasa Melayu sahaja.
 - Jangan tambah fakta di luar konteks.
-- Jika membuat penaakulan, mulakan dengan frasa "{cautious.strip()}".
-- Gunakan format bahagian yang sesuai: Jawapan, Maklumat lanjut, Kesimpulan.
+- Gunakan format bahagian yang sesuai: Jawapan, Maklumat lanjut.
 """
     try:
         return ollama_generate(prompt, temperature=0.2)
@@ -246,22 +334,46 @@ Arahan:
         return WEAK_RAG_MESSAGE
 
 
+_NO_DATA_MESSAGE = (
+    "Maaf, maklumat tepat tentang soalan ini tidak tersedia dalam pangkalan data JomKecek buat masa ini. "
+    "Untuk maklumat terkini dan tepat, sila rujuk sumber rasmi seperti laman web Kerajaan Negeri Kelantan "
+    "atau Tourism Kelantan."
+)
+
+
 def answer_with_llm_knowledge(query: str) -> dict[str, Any]:
-    """Direct LLM answer for dynamic/current-events topics — no RAG retrieval."""
+    """LLM fallback — only for genuinely dynamic topics (politik, cuaca, perangkaan semasa).
+    Returns a safe 'no data' message for specific factual questions to prevent hallucination."""
+    # Specific factual questions should NOT fall through to LLM free-generation
+    # because the model hallucinates Kelantan-specific names confidently but wrongly.
+    factual_signals = {
+        "nama", "apakah", "siapakah", "berapakah", "di manakah",
+        "lapangan", "stadium", "masjid", "hospital", "universiti",
+        "gua", "gunung", "bukit", "sungai", "pulau",
+    }
+    q_tokens = set(query.lower().split())
+    if factual_signals & q_tokens:
+        return {
+            "response_type": "no_data",
+            "summary": _NO_DATA_MESSAGE,
+            "items": [],
+            "sections": [],
+            "llm_note": _NO_DATA_MESSAGE,
+            "used_llm": False,
+        }
+
     prompt = f"""{GENERAL_KELANTAN_PROMPT}
 
-Soalan berkaitan Kelantan:
+Soalan berkaitan Kelantan (topik semasa/dinamik):
 {query}
 
-Arahan tambahan:
-- Jawab berdasarkan pengetahuan umum tentang Kelantan.
-- Jika maklumat bersifat semasa (pemimpin semasa, cuaca terkini, perangkaan terbaru), nyatakan bahawa maklumat mungkin telah berubah dan cadangkan pengguna semak sumber rasmi.
-- Jawab dalam Bahasa Melayu, ringkas dan tepat.
+Arahan: Jawab hanya jika ini soalan umum tentang budaya, adat, atau geografi am Kelantan.
+Jika melibatkan fakta spesifik (nama orang, nama tempat, angka), nyatakan bahawa pengguna perlu semak sumber rasmi.
 """
     try:
-        answer = ollama_generate(prompt, temperature=0.3)
+        answer = ollama_generate(prompt, temperature=0.1)
     except Exception:
-        answer = "Maaf, tidak dapat mendapatkan maklumat buat masa ini. Sila semak sumber rasmi."
+        answer = _NO_DATA_MESSAGE
 
     return {
         "response_type": "llm_knowledge",
@@ -274,42 +386,18 @@ Arahan tambahan:
 
 
 def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -> dict[str, Any]:
-    # Static canonical facts (ibu negeri, jajahan count, gelaran, etc.)
-    known = lookup_canonical_fact(query)
-    if known:
-        summary = known["answer"]
-        if answer_type == "detail":
-            summary += "\n\nMaklumat lanjut:\nMaklumat yang tersedia dalam JomKecek adalah berdasarkan rekod yang telah disahkan."
-        return {
-            "response_type": "fact",
-            "summary": summary,
-            "items": [],
-            "sections": [],
-            "llm_note": summary,
-            "used_llm": False,
-        }
-
     if not validate_rag_context(route, hits, answer_type):
-        return {
-            "response_type": "fallback",
-            "summary": WEAK_RAG_MESSAGE,
-            "items": [],
-            "sections": [],
-            "llm_note": "",
-            "used_llm": False,
-        }
+        # RAG tak jumpa — guna LLM terus untuk soalan umum Kelantan
+        return answer_with_llm_knowledge(query)
 
     if route.get("intent") == "unknown" and answer_type not in {"reasoning", "detail"}:
-        return {
-            "response_type": "fallback",
-            "summary": WEAK_RAG_MESSAGE,
-            "items": [],
-            "sections": [],
-            "llm_note": "",
-            "used_llm": False,
-        }
+        return answer_with_llm_knowledge(query)
 
-    card_query = answer_type == "recommendation" or any(word in query.lower() for word in ("tempat", "makanan", "budaya", "pantai", "pasar"))
+    # Cards only for recommendation/direct list queries — NOT for "ceritakan/huraikan" which should use LLM prose
+    card_query = answer_type == "recommendation" or (
+        answer_type not in {"detail", "reasoning"}
+        and any(word in query.lower() for word in ("tempat", "makanan", "budaya", "pantai", "pasar", "cadangkan"))
+    )
     items = build_tourism_items(query, hits) if card_query else []
     if items:
         response_type = "tourism"
@@ -401,6 +489,33 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
             "answer_type": answer_type,
         }
 
+    # Canonical facts shortcut — answers well-known Kelantan facts without RAG
+    # Runs for all intents since canonical lookup is a fast dict check
+    if route["mode"] not in {"out_of_scope", "dialect_translation", "llm_knowledge"}:
+        canonical_answer = _check_canonical(route["normalized_query"])
+        if canonical_answer:
+            kelantan_result = {
+                "response_type": "general",
+                "summary": canonical_answer,
+                "items": [],
+                "sections": [],
+                "llm_note": canonical_answer,
+                "used_llm": False,
+            }
+            answer = final_response_guard(canonical_answer)
+            return {
+                "intent": "kelantan",
+                "mode": "Info Kelantan",
+                "translation": {},
+                "kelantan": kelantan_result,
+                "answer": answer,
+                "eval": evaluate(answer, [canonical_answer], 1.0, False, question=route["normalized_query"]),
+                "contexts": [],
+                "visual_keywords": [],
+                "route": route,
+                "answer_type": answer_type,
+            }
+
     intent = "translation" if route["mode"] == "dialect_translation" else "kelantan"
     hits = [] if intent == "translation" else retrieve_expanded_context(
         route["normalized_query"], route.get("intent", ""), answer_type, route
@@ -409,6 +524,10 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
 
     if intent == "translation":
         translation = translate_dialect(route["normalized_query"])
+        matched_words = [item["dialect"] for item in translation.get("breakdown", []) if item.get("matched")]
+        rag_examples, rag_hits = _get_dialect_examples(matched_words)
+        translation["rag_examples"] = rag_examples
+        hits = rag_hits  # use dialect RAG hits for evaluation context
         result = {
             "intent": "translation",
             "mode": "Terjemahan Dialek",

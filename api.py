@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from backend import chatbot_pipeline, get_metrics
 from jomkecek.data import load_documents
+from jomkecek.pipeline import metrics as get_metrics, run_chatbot as chatbot_pipeline
 
 
 ROOT = Path(__file__).parent
@@ -156,93 +156,130 @@ def chat(payload: ChatRequest) -> dict:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
+_SKIP_EXTS = {".svg", ".ogg", ".ogv", ".webm", ".mp3", ".pdf", ".tif", ".tiff"}
+
+
+def _commons_image_hits(query: str, limit: int) -> list[dict[str, str]]:
+    params = {
+        "action": "query",
+        "generator": "search",
+        "gsrsearch": query,
+        "gsrnamespace": 6,
+        "gsrlimit": min(limit + 4, 12),
+        "prop": "imageinfo",
+        "iiprop": "url|extmetadata",
+        "format": "json",
+        "origin": "*",
+    }
+    try:
+        resp = requests.get("https://commons.wikimedia.org/w/api.php", params=params, headers=WIKI_HEADERS, timeout=10)
+        resp.raise_for_status()
+    except Exception:
+        return []
+
+    pages = resp.json().get("query", {}).get("pages", {})
+    hits: list[dict[str, str]] = []
+    for page in sorted(pages.values(), key=lambda p: p.get("index", 999)):
+        info = (page.get("imageinfo") or [{}])[0]
+        url = info.get("url", "")
+        if not url or any(url.lower().endswith(e) for e in _SKIP_EXTS):
+            continue
+        hits.append(
+            {
+                "url": url,
+                "title": page.get("title", query).replace("File:", ""),
+                "source": info.get("descriptionurl", url),
+            }
+        )
+        if len(hits) >= limit:
+            break
+    return hits
+
+
+def _wikipedia_image_hits(query: str, limit: int, lang: str = "ms") -> list[dict[str, str]]:
+    params = {
+        "action": "query",
+        "generator": "search",
+        "gsrsearch": query,
+        "gsrnamespace": 0,
+        "gsrlimit": limit + 2,
+        "prop": "pageimages",
+        "piprop": "original",
+        "format": "json",
+        "origin": "*",
+    }
+    try:
+        resp = requests.get(f"https://{lang}.wikipedia.org/w/api.php", params=params, timeout=10)
+        resp.raise_for_status()
+    except Exception:
+        return []
+
+    pages = resp.json().get("query", {}).get("pages", {})
+    hits: list[dict[str, str]] = []
+    for page in pages.values():
+        info = page.get("original") or {}
+        url = info.get("source", "")
+        if not url or any(url.lower().endswith(e) for e in _SKIP_EXTS):
+            continue
+        hits.append(
+            {
+                "url": url,
+                "title": page.get("title", query),
+                "source": f"https://{lang}.wikipedia.org/wiki/{page.get('title', '').replace(' ', '_')}",
+            }
+        )
+        if len(hits) >= limit:
+            break
+    return hits
+
+
 @app.post("/images")
 def images(payload: ImageSearchRequest) -> dict[str, list[dict[str, str]]]:
     results: list[dict[str, str]] = []
     seen: set[str] = set()
 
     def query_variants(keyword: str) -> list[str]:
-        clean = re.sub(r"\([^)]*\)", "", keyword)
-        clean = re.sub(r"\bKelantan\b", "", clean, flags=re.IGNORECASE)
-        clean = re.sub(r"\s+", " ", clean).strip()
-        variants = [keyword.strip(), clean]
-        words = clean.split()
-        if len(words) > 2:
-            variants.append(" ".join(words[:2]))
-        return [variant for i, variant in enumerate(variants) if variant and variant not in variants[:i]]
+        full = re.sub(r"\s+", " ", keyword.strip())
+        no_parens = re.sub(r"\([^)]*\)", "", full)
+        no_parens = re.sub(r"\s+", " ", no_parens).strip()
+        words = no_parens.split()
+        short = " ".join(words[:3]) if len(words) > 3 else ""
+        seen_v: list[str] = []
+        for v in [full, no_parens, short]:
+            if v and v not in seen_v:
+                seen_v.append(v)
+        return seen_v
 
     for keyword in payload.keywords:
         variants = query_variants(keyword)
         keyword_results: list[dict[str, str]] = []
+
+        # 1. Wikimedia Commons (File namespace) — best for cultural images
         for query in variants:
-            if keyword_results:
+            hits = [h for h in _commons_image_hits(query, payload.limit_per_keyword) if h["url"] not in seen]
+            if hits:
+                keyword_results.extend(hits[:payload.limit_per_keyword])
                 break
-            params = {
-                "action": "query",
-                "generator": "search",
-                "gsrsearch": query,
-                "gsrnamespace": 6,
-                "gsrlimit": payload.limit_per_keyword,
-                "prop": "imageinfo",
-                "iiprop": "url|extmetadata",
-                "format": "json",
-                "origin": "*",
-            }
-            try:
-                response = requests.get("https://commons.wikimedia.org/w/api.php", params=params, headers=WIKI_HEADERS, timeout=10)
-                response.raise_for_status()
-            except Exception:
-                continue
 
-            pages = response.json().get("query", {}).get("pages", {})
-            for page in sorted(pages.values(), key=lambda item: item.get("index", 999)):
-                info = (page.get("imageinfo") or [{}])[0]
-                url = info.get("url")
-                if not url or url in seen:
-                    continue
-                seen.add(url)
-                keyword_results.append(
-                    {
-                        "url": url,
-                        "title": page.get("title", query).replace("File:", ""),
-                        "source": info.get("descriptionurl", url),
-                    }
-                )
+        # 2. Malay Wikipedia pageimages — good for Malaysian content
+        if not keyword_results:
+            for query in variants:
+                hits = [h for h in _wikipedia_image_hits(query, payload.limit_per_keyword, "ms") if h["url"] not in seen]
+                if hits:
+                    keyword_results.extend(hits)
+                    break
 
-        if keyword_results:
-            results.extend(keyword_results)
-            continue
+        # 3. English Wikipedia pageimages — broad fallback
+        if not keyword_results:
+            for query in variants[:2]:
+                hits = [h for h in _wikipedia_image_hits(query, payload.limit_per_keyword, "en") if h["url"] not in seen]
+                if hits:
+                    keyword_results.extend(hits)
+                    break
 
-        params = {
-            "action": "query",
-            "generator": "search",
-            "gsrsearch": variants[-1] if variants else keyword,
-            "gsrnamespace": 0,
-            "gsrlimit": payload.limit_per_keyword,
-            "prop": "pageimages",
-            "piprop": "original",
-            "format": "json",
-            "origin": "*",
-        }
-        try:
-            response = requests.get("https://commons.wikimedia.org/w/api.php", params=params, headers=WIKI_HEADERS, timeout=10)
-            response.raise_for_status()
-        except Exception:
-            continue
-
-        pages = response.json().get("query", {}).get("pages", {})
-        for page in pages.values():
-            info = page.get("original") or {}
-            url = info.get("source")
-            if not url or url in seen:
-                continue
-            seen.add(url)
-            results.append(
-                {
-                    "url": url,
-                    "title": page.get("title", keyword).replace("File:", ""),
-                    "source": f"https://commons.wikimedia.org/wiki/{page.get('title', '').replace(' ', '_')}",
-                }
-            )
+        for hit in keyword_results[:payload.limit_per_keyword]:
+            if hit["url"] not in seen:
+                seen.add(hit["url"])
+                results.append(hit)
 
     return {"images": results[:8]}

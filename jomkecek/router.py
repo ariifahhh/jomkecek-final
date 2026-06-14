@@ -47,15 +47,19 @@ def _is_dynamic_topic(tokens: set[str]) -> bool:
 
 def _intent_and_collections(normalized: str) -> tuple[str, list[str]]:
     tokens = set(tokenize(normalized))
-    if {"makanan", "tradisional"} & tokens:
+    if "makanan" in tokens:
         return "food", ["food"]
-    if {"nasi", "kerabu", "budu", "ulam", "percik", "laksa", "laksam", "akok", "kuih"} & tokens:
+    if {"nasi", "kerabu", "budu", "ulam", "percik", "laksa", "laksam", "akok", "kuih",
+            "gulai", "sambal", "rendang", "lemang", "satay", "budu", "solok"} & tokens:
         return "food", ["food"]
-    if "budaya" in tokens:
+    if {"budaya", "kraftangan", "wayang", "dikir", "gasing", "wau", "batik",
+            "songket", "tarian", "silat", "persembahan", "tradisional", "seni",
+            "permainan", "kulit", "patung", "anyaman", "ukiran"} & tokens:
         return "culture", ["culture"]
     if {"tempat", "menarik", "pantai", "pasar", "muzium", "pelancongan"} & tokens:
         return "tourism", ["tourism"]
-    if {"jajahan", "ibu", "negeri", "sungai", "bendera", "gelaran", "lokasi"} & tokens:
+    if {"jajahan", "ibu", "negeri", "sungai", "bendera", "gelaran", "lokasi",
+            "lapangan", "terbang", "stadium", "tanah", "tinggi", "gua"} & tokens:
         return "general_fact", ["canonical_facts", "qa_umum_kelantan"]
     return "unknown", ["qa_umum_kelantan", "tourism", "food", "culture"]
 

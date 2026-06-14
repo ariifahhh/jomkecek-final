@@ -25,28 +25,49 @@ def _get_embed_fn():
 
 def collections_for_query(query: str) -> set[str]:
     q = set(tokenize(query))
+
+    # Food items and cooking terms — from makanan_tradisional sheet
     food_terms = {
-        "makanan",
-        "tradisional",
-        "nasi",
-        "kerabu",
-        "budu",
-        "ulam",
-        "percik",
-        "laksa",
-        "laksam",
-        "akok",
-        "kuih",
-        "ayam",
-        "sarapan",
+        "makanan", "makan", "minum", "minuman", "hidangan", "lauk", "resepi", "masak",
+        "sarapan", "snek", "pencuci", "ulaman",
+        # specific dishes
+        "nasi", "kerabu", "dagang", "laksam", "laksa", "akok", "percik", "satay",
+        "lompat", "tikam", "etok", "murtabak", "gulai", "kuzi", "putu", "nekabat",
+        "solok", "somtam", "colek", "tumpang", "celup", "budu", "ulam", "kuih",
+        "tahi", "itik", "jala", "serikaya", "tempoyak",
     }
+
+    # Culture items — from budaya sheet: permainan tradisional, seni kraf, adat resam, etc.
+    culture_terms = {
+        "budaya", "kraftangan", "warisan", "tradisional", "seni", "adat", "resam",
+        "permainan", "tarian", "muzik", "pakaian",
+        # specific arts / games / craft
+        "wayang", "kulit", "dikir", "barat", "yong", "menora", "rebana", "silat",
+        "gasing", "wau", "songket", "batik", "ukiran", "keris", "anyaman", "tenunan",
+        "semutar", "kertok", "lereng", "tembaga", "cekak", "musang", "janggut", "asyik",
+        "kraf", "kraftangan", "pertukangan", "perak", "besi",
+    }
+
+    # Tourism places — from tempat_menarik sheet: alam, agama, sejarah, rekreasi, etc.
+    tourism_terms = {
+        "tempat", "pantai", "masjid", "muzium", "pasar", "istana", "hotel",
+        "wat", "sungai", "jambatan", "bukit", "taman", "kampung", "gua",
+        "makam", "tasik", "hutan", "menarik", "pelancongan", "lawatan",
+        "destinasi", "rekreasi", "landmark", "agama", "sejarah", "alam",
+        # specific places
+        "cahaya", "bulan", "muhammadi", "khadijah", "balai", "photivihan",
+        "machimmaram", "bisikan", "bayu", "irama", "lojing", "panau",
+    }
+
+    result: set[str] = set()
     if food_terms & q:
-        return {"food"}
-    if "budaya" in q:
-        return {"culture"}
-    if {"tempat", "pantai", "pasar", "muzium", "hotel", "menarik"} & q:
-        return {"tourism"}
-    return {"tourism", "food", "culture"}
+        result.add("food")
+    if culture_terms & q:
+        result.add("culture")
+    if tourism_terms & q:
+        result.add("tourism")
+
+    return result or {"tourism", "food", "culture"}
 
 
 def keyword_score(query_tokens: list[str], doc: RagDocument, df: Counter, total: int) -> float:

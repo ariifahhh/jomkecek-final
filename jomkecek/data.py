@@ -9,33 +9,6 @@ from .config import COLLECTIONS, DATA_PATHS
 from .models import RagDocument
 
 
-TOURISM_SEEDS = [
-    {
-        "nama": "Pasar Siti Khadijah",
-        "daerah": "Kota Bharu",
-        "kategori": "tempat_menarik",
-        "deskripsi": "Pasar ikonik di Kota Bharu yang terkenal dengan makanan, kuih tradisional, batik dan suasana perniagaan tempatan.",
-    },
-    {
-        "nama": "Pantai Cahaya Bulan",
-        "daerah": "Kota Bharu",
-        "kategori": "tempat_menarik",
-        "deskripsi": "Pantai popular berhampiran Kota Bharu untuk bersantai, menikmati angin laut dan makanan ringan tempatan.",
-    },
-    {
-        "nama": "Muzium Negeri Kelantan",
-        "daerah": "Kota Bharu",
-        "kategori": "tempat_menarik",
-        "deskripsi": "Muzium yang memaparkan sejarah, budaya dan warisan negeri Kelantan.",
-    },
-    {
-        "nama": "Istana Jahar",
-        "daerah": "Kota Bharu",
-        "kategori": "tempat_menarik",
-        "deskripsi": "Bangunan warisan diraja Kelantan yang menempatkan pameran budaya dan adat istiadat Melayu Kelantan.",
-    },
-]
-
 
 def active_data_path() -> str:
     for path in DATA_PATHS:
@@ -114,16 +87,5 @@ def load_documents() -> list[RagDocument]:
                 if doc:
                     docs.append(doc)
 
-    for i, seed in enumerate(TOURISM_SEEDS, start=1):
-        docs.append(
-            RagDocument(
-                text=f"nama: {seed['nama']} | daerah: {seed['daerah']} | kategori: {seed['kategori']} | deskripsi: {seed['deskripsi']}",
-                category="tempat_menarik",
-                title=seed["nama"],
-                row=100000 + i,
-                collection="tourism",
-                metadata=seed,
-            )
-        )
     return docs
 
