@@ -61,13 +61,13 @@ def collections_for_query(query: str) -> set[str]:
 
     result: set[str] = set()
     if food_terms & q:
-        result.add("food")
+        result.add("makanan_tradisional")
     if culture_terms & q:
-        result.add("culture")
+        result.add("budaya")
     if tourism_terms & q:
-        result.add("tourism")
+        result.add("tempat_menarik")
 
-    return result or {"tourism", "food", "culture"}
+    return result or {"tempat_menarik", "makanan_tradisional", "budaya"}
 
 
 def keyword_score(query_tokens: list[str], doc: RagDocument, df: Counter, total: int) -> float:

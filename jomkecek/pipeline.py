@@ -37,6 +37,44 @@ def _get_dialect_examples(matched_words: list[str]) -> tuple[list[dict], list]:
     return examples, hits
 
 
+def _llm_translate(query: str, examples: list[dict], breakdown: list[dict], direction: str) -> str:
+    """RAG path: generate natural translation using retrieved examples as context."""
+    if direction == "dialect_to_bm":
+        from_lang, to_lang = "dialek Kelantan", "Bahasa Melayu standard"
+    else:
+        from_lang, to_lang = "Bahasa Melayu standard", "dialek Kelantan"
+
+    context_lines = "\n".join(
+        f"- {ex['dialek']} → {ex['bm']}"
+        for ex in examples
+        if ex.get("dialek") and ex.get("bm")
+    )
+    word_hints = "\n".join(
+        f"- {item['dialect']} → {item['bm']}"
+        for item in breakdown
+        if item.get("bm") and item.get("bm") != "tiada dalam pangkalan data" and item.get("confidence", 0) > 0
+    )
+
+    prompt = f"""Anda ialah penterjemah dialek Kelantan yang pakar.
+
+Contoh terjemahan dari pangkalan data JomKecek:
+{context_lines}
+
+Padanan perkataan:
+{word_hints}
+
+Terjemahkan ayat berikut dari {from_lang} kepada {to_lang}:
+"{query}"
+
+Berikan HANYA terjemahan sahaja, tanpa penjelasan atau nota tambahan."""
+
+    try:
+        result = ollama_generate(prompt, temperature=0.1)
+        return result.strip().strip('"').strip("'").strip()
+    except Exception:
+        return ""
+
+
 def detect_answer_type(query: str) -> str:
     q = query.lower()
     if any(term in q for term in ("mengapakah", "bagaimanakah", "kenapa", "bagaimana", "pada pendapat anda")):
@@ -65,7 +103,7 @@ def expand_query_for_detail(query: str) -> str:
 
 
 def _collections_from_route(route: dict[str, Any]) -> set[str] | None:
-    mapped = {c for c in route.get("collection_filter", []) if c in {"tourism", "food", "culture"}}
+    mapped = {c for c in route.get("collection_filter", []) if c in {"tempat_menarik", "makanan_tradisional", "budaya"}}
     return mapped or None
 
 
@@ -128,11 +166,11 @@ def validate_context_relevance(query: str, hit, intent: str, answer_type: str) -
     }
     doc_tokens = set(tokenize(f"{hit.document.title} {hit.document.text} {' '.join(hit.document.metadata.values())}"))
     overlap = len(query_tokens & doc_tokens)
-    if intent == "food" and hit.document.collection != "food":
+    if intent == "makanan_tradisional" and hit.document.collection != "makanan_tradisional":
         return False
-    if intent == "tourism" and hit.document.collection != "tourism":
+    if intent == "tempat_menarik" and hit.document.collection != "tempat_menarik":
         return False
-    if intent == "culture" and hit.document.collection != "culture":
+    if intent == "budaya" and hit.document.collection != "budaya":
         return False
     if intent == "geography":
         query_weather = {"cuaca", "monsun", "hujan", "banjir"} & set(tokenize(query))
@@ -189,7 +227,7 @@ _CANONICAL_KELANTAN: dict[str, str] = {
         "Kuala Krai, Machang, Tanah Merah, Jeli dan Gua Musang."
     ),
     "bendera": (
-        "Bendera Kelantan berwarna merah jambu (fuchsia) dengan gambar wau bulan berwarna putih "
+        "Bendera Kelantan berwarna merah dengan gambar wau bulan dan bintang berwarna putih "
         "di bahagian tengah."
     ),
     "luas": "Kelantan berkeluasan 15,099 kilometer persegi.",
@@ -400,11 +438,11 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
     )
     items = build_tourism_items(query, hits) if card_query else []
     if items:
-        response_type = "tourism"
-        if route.get("intent") == "food":
-            response_type = "food"
-        elif route.get("intent") == "culture":
-            response_type = "culture"
+        response_type = "tempat_menarik"
+        if route.get("intent") == "makanan_tradisional":
+            response_type = "makanan_tradisional"
+        elif route.get("intent") == "budaya":
+            response_type = "budaya"
         return {
             "response_type": response_type,
             "summary": "Cadangan ringkas berdasarkan konteks JomKecek.",
@@ -526,13 +564,28 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
         translation = translate_dialect(route["normalized_query"])
         matched_words = [item["dialect"] for item in translation.get("breakdown", []) if item.get("matched")]
         rag_examples, rag_hits = _get_dialect_examples(matched_words)
+
+        # RAG + LLM path: use retrieved examples as context for LLM to generate natural translation
+        used_llm = False
+        if rag_examples:
+            llm_result = _llm_translate(
+                route["normalized_query"],
+                rag_examples,
+                translation.get("breakdown", []),
+                translation.get("direction", "dialect_to_bm"),
+            )
+            if llm_result:
+                translation["translation"] = llm_result
+                used_llm = True
+        # Fallback: dict-based translation already in translation["translation"]
+
         translation["rag_examples"] = rag_examples
-        hits = rag_hits  # use dialect RAG hits for evaluation context
+        hits = rag_hits
         result = {
             "intent": "translation",
             "mode": "Terjemahan Dialek",
             "translation": translation,
-            "kelantan": {"summary": "", "items": [], "used_llm": False},
+            "kelantan": {"summary": "", "items": [], "used_llm": used_llm},
         }
         confidence = translation["confidence"]
         strict = True

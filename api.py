@@ -112,9 +112,9 @@ def catalog() -> dict[str, list[dict[str, str | int]]]:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     allowed = {
-        "tourism": "Tempat Menarik",
-        "food": "Makanan Tradisional",
-        "culture": "Budaya",
+        "tempat_menarik": "Tempat Menarik",
+        "makanan_tradisional": "Makanan Tradisional",
+        "budaya": "Budaya",
     }
     seen: set[tuple[str, str]] = set()
     items: list[dict[str, str | int]] = []

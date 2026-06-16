@@ -32,7 +32,7 @@ except ImportError:
 from jomkecek.config import CHROMA_PATH, EMBED_MODEL
 from jomkecek.data import load_documents
 
-TARGET_COLLECTIONS = {"tourism", "food", "culture"}
+TARGET_COLLECTIONS = {"tempat_menarik", "makanan_tradisional", "budaya"}
 BATCH_SIZE = 128
 
 

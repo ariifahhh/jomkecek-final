@@ -5,11 +5,14 @@ import {
   BarChart3,
   Bot,
   Check,
+  ChevronDown,
+  ChevronUp,
   Clock3,
   Compass,
   Copy,
   Database,
   Home,
+  Lightbulb,
   Loader2,
   MapPinned,
   MessageCircle,
@@ -244,9 +247,178 @@ function renderAnswer(result: ChatResult) {
   return <p>{result.answer}</p>;
 }
 
+const imbuhanExamples = [
+  { from: "diambil", to: "DI AMBIL" },
+  { from: "berjalan", to: "BER JALAN" },
+  { from: "macamtu", to: "MACAM TU" },
+  { from: "takpayah", to: "TAK PAYAH" },
+  { from: "gituah", to: "GITU LAH" },
+];
+
+const bakuExamples = [
+  { from: "nk g", to: "NAK PERGI" },
+  { from: "xde", to: "TIADA" },
+  { from: "dh mkn", to: "SUDAH MAKAN" },
+  { from: "sbb ape", to: "SEBAB APA" },
+  { from: "btol ke", to: "BETUL KE" },
+];
+
+function TipsTerjemahan() {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="tips-panel">
+      <div className="tips-header" onClick={() => setOpen((o) => !o)}>
+        <div className="tips-header-left">
+          <span className="tips-icon"><Lightbulb size={18} /></span>
+          <div>
+            <strong>TIPS TERJEMAHAN</strong>
+            <p>Panduan untuk terjemahan yang lebih tepat.</p>
+          </div>
+        </div>
+        <button className="tips-toggle" type="button" aria-label="Togol tips">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+      </div>
+      {open && (
+        <div className="tips-body">
+          <div className="tip-section">
+            <h3><span className="tip-num tip-num-blue">01.</span> Nama Khas &amp; Kata Nama Khas</h3>
+            <p>
+              Untuk mengelakkan <strong>Nama Orang</strong> atau <strong>Nama Tempat</strong> diterjemahkan secara salah,
+              mulakan perkataan dengan <strong>Huruf Besar</strong> di hadapan. Sistem akan mengabaikan terjemahan bagi perkataan tersebut.
+            </p>
+          </div>
+          <div className="tip-section">
+            <h3><span className="tip-num tip-num-teal">02.</span> Pisahkan Perkataan (Imbuhan)</h3>
+            <p>Sangat disyorkan untuk memisahkan perkataan dengan <strong>jarak (space)</strong> bagi mendapatkan terjemahan yang lebih tepat (Contoh):</p>
+            <div className="tip-examples">
+              {imbuhanExamples.map((ex) => (
+                <div key={ex.from} className="tip-ex-card tip-ex-blue">
+                  <span className="tip-ex-from">{ex.from}</span>
+                  <span className="tip-ex-to">{ex.to}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="tip-section">
+            <h3><span className="tip-num tip-num-blue">03.</span> Gunakan Bahasa Melayu Baku</h3>
+            <p>Gunakan official <strong>&apos;Bahasa Baku&apos;</strong> dalam Bahasa Melayu untuk terjemahan lebih tepat. Elakkan menggunakan &apos;slang&apos; atau singkatan (Contoh):</p>
+            <div className="tip-examples">
+              {bakuExamples.map((ex) => (
+                <div key={ex.from} className="tip-ex-card tip-ex-yellow">
+                  <span className="tip-ex-from">{ex.from}</span>
+                  <span className="tip-ex-to">{ex.to}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const tipsPelanconganItems = [
+  {
+    num: "01", color: "blue" as const,
+    title: "Gunakan Nama Spesifik",
+    body: <>Nyatakan nama <strong>tempat, makanan atau acara</strong> yang tepat untuk jawapan lebih terperinci. Contoh: <em>"Ceritakan tentang Pantai Cahaya Bulan"</em> lebih baik daripada <em>"pantai Kelantan"</em>.</>,
+  },
+  {
+    num: "02", color: "teal" as const,
+    title: "Kata Tanya → Penerangan",
+    body: <>Gunakan <strong>apa, di mana, kenapa, bagaimana</strong> atau <strong>ceritakan</strong> untuk mendapat jawapan berbentuk <strong>naratif</strong> yang menjelaskan dengan lanjut.</>,
+  },
+  {
+    num: "03", color: "blue" as const,
+    title: "\"Senaraikan\" → Senarai Pilihan",
+    body: <>Gunakan perkataan <strong>senaraikan, listkan</strong> atau <strong>berikan</strong> untuk mendapat beberapa pilihan sekaligus. Contoh: <em>"Senaraikan tempat menarik di Kota Bharu"</em>.</>,
+  },
+];
+
+const kawalanSkopItems = [
+  {
+    icon: "🗺️",
+    title: "Terhad kepada Kelantan",
+    body: "Sistem hanya melayan soalan berkaitan Kelantan. Pertanyaan tentang negeri atau negara lain tidak akan dilayan.",
+  },
+  {
+    icon: "🔍",
+    title: "Hybrid RAG",
+    body: "Jika maklumat wujud dalam dataset tempatan → jawapan bersumberkan RAG. Jika tiada → LLM digunakan dengan kawalan ketat supaya kekal dalam skop Kelantan.",
+  },
+  {
+    icon: "📋",
+    title: "Format Jawapan Adaptif",
+    body: "Kata tanya (apa, di mana, ceritakan) → penerangan naratif. Kata arahan (senaraikan, berikan) atau tiada kata tanya → jawapan dalam bentuk senarai.",
+  },
+];
+
+function TipsPelancongan() {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="tips-panel">
+      <div className="tips-header" onClick={() => setOpen((o) => !o)}>
+        <div className="tips-header-left">
+          <span className="tips-icon tips-icon-teal"><Compass size={18} /></span>
+          <div>
+            <strong>TIPS PERTANYAAN</strong>
+            <p>Panduan untuk carian pelancongan yang lebih tepat.</p>
+          </div>
+        </div>
+        <button className="tips-toggle" type="button" aria-label="Togol tips">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+      </div>
+      {open && (
+        <div className="tips-body">
+          {tipsPelanconganItems.map((item) => (
+            <div key={item.num} className="tip-section">
+              <h3>
+                <span className={`tip-num tip-num-${item.color}`}>{item.num}.</span> {item.title}
+              </h3>
+              <p>{item.body}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function KawalanSkop() {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="tips-panel">
+      <div className="tips-header" onClick={() => setOpen((o) => !o)}>
+        <div className="tips-header-left">
+          <span className="tips-icon tips-icon-maroon"><ShieldCheck size={18} /></span>
+          <div>
+            <strong>KAWALAN SKOP</strong>
+            <p>Had dan kawalan sistem pertanyaan.</p>
+          </div>
+        </div>
+        <button className="tips-toggle" type="button" aria-label="Togol kawalan skop">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+      </div>
+      {open && (
+        <div className="tips-body">
+          {kawalanSkopItems.map((item) => (
+            <div key={item.title} className="tip-section">
+              <h3><span className="tip-scope-icon">{item.icon}</span> {item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [view, setView] = useState<NavView>("landing");
-  const [mode, setMode] = useState("Info Kelantan");
+  const [mode, setMode] = useState("Terjemahan Dialek");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -448,7 +620,7 @@ export default function HomePage() {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <button className={view === item.id ? "active" : ""} key={item.id} type="button" onClick={() => setView(item.id)}>
+              <button className={view === item.id ? "active" : ""} key={item.id} type="button" onClick={() => { setView(item.id); if (item.id === "chat") setMode("Terjemahan Dialek"); }}>
                 <Icon size={18} />
                 {item.label}
               </button>
@@ -491,7 +663,7 @@ export default function HomePage() {
                   dan menjawab berdasarkan pangkalan data tempatan yang disahkan.
                 </p>
                 <div className="landing-actions">
-                  <button type="button" onClick={() => setView("chat")}>
+                  <button type="button" onClick={() => { setView("chat"); setMode("Terjemahan Dialek"); }}>
                     <MessageCircle size={18} />
                     Mula Chat
                   </button>
@@ -633,16 +805,9 @@ export default function HomePage() {
             </section>
 
             <aside className="insight-panel">
-              <section>
-                <h2><ShieldCheck size={18} /> Kawalan Skop</h2>
-                <p>Jawapan dikawal kepada domain Kelantan dan konteks set data.</p>
-                {lastResult?.route?.mode && (
-                  <p style={{ fontSize: "0.72rem", marginTop: "0.4rem", opacity: 0.7 }}>
-                    Mod: <strong>{lastResult.route.mode}</strong>
-                    {lastResult.answer_type ? ` · ${lastResult.answer_type}` : ""}
-                  </p>
-                )}
-              </section>
+              {mode === "Terjemahan Dialek" && <TipsTerjemahan />}
+              {mode === "Info Kelantan" && <TipsPelancongan />}
+              {mode === "Info Kelantan" && <KawalanSkop />}
               <section>
                 <h2><BarChart3 size={18} /> ROUGE-L</h2>
                 <p className="metric-desc">Mengukur padanan token antara jawapan chatbot dengan konteks sumber yang ditemui.</p>
@@ -654,14 +819,10 @@ export default function HomePage() {
                 <h2><Bot size={18} /> Triad RAG</h2>
                 <p className="metric-desc">Penilaian automatik menggunakan LLM-as-a-Judge — mengukur kualiti RAG dari tiga dimensi.</p>
                 <div className="metric-bars">
-                  <MetricBar label="Kerelevanan Konteks" value={lastResult?.eval?.context_precision} />
                   <MetricBar label="Groundedness" value={lastResult?.eval?.judge_faithfulness} />
                   <MetricBar label="Kerelevanan Jawapan" value={lastResult?.eval?.judge_relevancy} />
+                  <MetricBar label="Kelengkapan Jawapan" value={lastResult?.eval?.judge_completeness} />
                 </div>
-              </section>
-              <section>
-                <h2><Database size={18} /> Koleksi</h2>
-                <p>{metrics?.collections?.join(", ") || "dialek, pelancongan, makanan, budaya"}</p>
               </section>
             </aside>
             </div>

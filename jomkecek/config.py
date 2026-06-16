@@ -22,8 +22,8 @@ DEFAULT_TOP_K = 6
 COLLECTIONS = {
     "dialect_words": {"perkataan"},
     "dialect_sentences": {"contoh_ayat"},
-    "tourism": {"tempat_menarik"},
-    "food": {"makanan_tradisional"},
-    "culture": {"budaya"},
+    "tempat_menarik": {"tempat_menarik"},
+    "makanan_tradisional": {"makanan_tradisional"},
+    "budaya": {"budaya"},
 }
 
