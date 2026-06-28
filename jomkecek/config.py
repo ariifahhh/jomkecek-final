@@ -2,9 +2,8 @@ import os
 
 
 DATA_PATHS = (
-    "DATA_JOMKECEK_CLEANED copy.xlsx",
-    "DATA_JOMKECEK_CLEANED.csv",
     "DATA_JOMKECEK_CLEANED.xlsx",
+    "DATA_JOMKECEK_CLEANED.csv",
 )
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")

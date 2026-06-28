@@ -62,7 +62,7 @@ FastAPI (port 8000 — run locally)
 | LLM (judge) | qwen2.5:7b via Ollama |
 | Vector DB | ChromaDB |
 | Embeddings | sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 |
-| Dataset | DATA_JOMKECEK_CLEANED copy.xlsx (dialect, tourism, food, culture) |
+| Dataset | DATA_JOMKECEK_CLEANED.xlsx (dialect, tourism, food, culture) |
 | Deployment | Vercel (frontend) + local/ngrok (backend) |
 
 ---
@@ -226,7 +226,7 @@ jomkecek-final/
 ├── .env.example                    Environment variable reference
 ├── requirements.txt
 │
-├── DATA_JOMKECEK_CLEANED copy.xlsx Main dataset (5 sheets, ~1,949 records)
+├── DATA_JOMKECEK_CLEANED.xlsx Main dataset (5 sheets, ~1,949 records)
 │
 ├── frontend/                       Next.js 14 app (deploy this on Vercel)
 │   ├── public/
@@ -272,7 +272,7 @@ NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 
 ## Dataset
 
-`DATA_JOMKECEK_CLEANED copy.xlsx` contains 5 sheets:
+`DATA_JOMKECEK_CLEANED.xlsx` contains 5 sheets:
 
 | Sheet | Records | Content |
 |---|---|---|
