@@ -127,9 +127,9 @@ const kelantanPrompts = [
 
 const catalogFilters = [
   { label: "Semua", value: "all" },
-  { label: "Tempat Menarik", value: "tourism" },
-  { label: "Makanan Tradisional", value: "food" },
-  { label: "Budaya", value: "culture" }
+  { label: "Tempat Menarik", value: "tempat_menarik" },
+  { label: "Makanan Tradisional", value: "makanan_tradisional" },
+  { label: "Budaya", value: "budaya" }
 ];
 
 const ITEMS_PER_PAGE = 12;
