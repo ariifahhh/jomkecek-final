@@ -602,15 +602,29 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
     context_texts = [hit.document.text for hit in hits]
     answer = format_answer(result)
     answer = final_response_guard(answer, route["normalized_query"], "\n".join(context_texts))
+
+    # For ROUGE-L: translation mode compares only the translated sentence against the
+    # ground-truth dialek_ayat/bm_ayat from the retrieved contoh_ayat record.
+    # QA mode keeps the retrieved context as reference (no ground truth available).
+    rouge_candidate = answer
+    rouge_reference = ""
+    if intent == "translation":
+        rouge_candidate = result["translation"].get("translation", answer)
+        direction = result["translation"].get("direction", "dialect_to_bm")
+        rag_examples = result["translation"].get("rag_examples", [])
+        if rag_examples:
+            rouge_reference = rag_examples[0].get("dialek", "") if direction == "bm_to_dialect" else rag_examples[0].get("bm", "")
+
     result.update(
         {
             "answer": answer,
             "eval": evaluate(
-                answer,
+                rouge_candidate,
                 context_texts,
                 max(confidence, LOW_RETRIEVAL_CONFIDENCE if hits else 0),
                 strict,
                 question=route["normalized_query"],
+                reference=rouge_reference,
                 mode=intent,
             ),
             "contexts": [
