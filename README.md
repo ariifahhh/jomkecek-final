@@ -9,7 +9,7 @@ JomKecek is a hybrid RAG chatbot for Kelantan dialect translation, tourism, food
 ## Features
 
 - **Dialect Translation** — Kelantan dialect ↔ Standard Malay using dictionary + fuzzy matching
-- **Hybrid RAG Retrieval** — BM25 lexical + ChromaDB vector search (multilingual sentence-transformers)
+- **Hybrid RAG Retrieval** — TF-IDF lexical + ChromaDB vector search (multilingual sentence-transformers)
 - **Dynamic Topic Routing** — Sultan, ekonomi, politik, cuaca queries bypass RAG and go directly to LLM
 - **LLM-as-Judge Evaluation** — `qwen2.5:7b` scores every answer on context relevance, groundedness and answer relevance
 - **Catalog Explorer** — Browse 1,000+ tourism, food and culture items with Wikimedia images
@@ -35,7 +35,7 @@ FastAPI (port 8000 — run locally)
         │                         ┌───────────┴────────────┐
         │                         ▼                        ▼
         │                  Dynamic Topics          Dataset RAG
-        │                  (LLM knowledge)    (BM25 + ChromaDB)
+        │                  (LLM knowledge)    (TF-IDF + ChromaDB)
         │                         │                        │
         │                         └───────────┬────────────┘
         │                                     ▼
@@ -242,7 +242,7 @@ jomkecek-final/
     ├── preprocessing.py            Tokenizer, normalizer
     ├── dialect.py                  Dialect translation (dict + fuzzy)
     ├── router.py                   Query routing + DYNAMIC_TOPICS
-    ├── retriever.py                BM25 + ChromaDB hybrid retrieval
+    ├── retriever.py                TF-IDF + ChromaDB hybrid retrieval
     ├── pipeline.py                 Main orchestration
     ├── evaluation.py               ROUGE-L + LLM-as-judge
     ├── guards.py                   Out-of-scope + response guard
