@@ -121,28 +121,65 @@ cd ..
 
 ## Running the App (Local)
 
+> **Windows note:** If `uvicorn` or `npm` is not recognised, see Troubleshooting below.
+
 ### Step 1 — Start Ollama
 
-```bash
+```powershell
 ollama serve
 ```
 
-### Step 2 — Start FastAPI backend
+### Step 2 — Start FastAPI backend (new terminal)
 
-```bash
+```powershell
+cd "C:\path\to\jomkecek-final"
+$env:PATH += ";C:\Users\<YourUsername>\AppData\Local\Python\pythoncore-3.14-64\Scripts"
 uvicorn api:app --reload
 ```
 
 Backend available at `http://localhost:8000` — API docs at `http://localhost:8000/docs`
 
-### Step 3 — Start Next.js frontend
+### Step 3 — Install frontend dependencies (first time only)
 
-```bash
+```powershell
 cd frontend
+npm install
+```
+
+### Step 4 — Start Next.js frontend (new terminal)
+
+```powershell
+cd "C:\path\to\jomkecek-final\frontend"
 npm run dev
 ```
 
 Open `http://localhost:3000`
+
+---
+
+## Troubleshooting (Windows)
+
+### `uvicorn` not recognised
+Add Python Scripts to PATH in the same terminal before running:
+```powershell
+$env:PATH += ";C:\Users\<YourUsername>\AppData\Local\Python\pythoncore-3.14-64\Scripts"
+uvicorn api:app --reload
+```
+
+### `npm` not recognised / execution policy error
+Run once to allow scripts:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+Then install dependencies and start:
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+### `next` not recognised
+`node_modules` belum install. Run `npm install` dalam folder `frontend/` dulu.
 
 ---
 
