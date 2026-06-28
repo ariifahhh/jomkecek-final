@@ -23,16 +23,22 @@ ANSWER_RELEVANCE: Does the answer address the question? (1.0=very relevant, 0.0=
 Output ONLY this line, nothing else:
 CONTEXT_RELEVANCE=0.X|GROUNDEDNESS=0.X|ANSWER_RELEVANCE=0.X"""
 
-_JUDGE_PROMPT_TRANSLATION = """You are an objective evaluator for a Kelantan dialect translation system. Score the output below.
+_JUDGE_PROMPT_TRANSLATION = """You are an objective evaluator for a Kelantan dialect translation system.
 
-Input (text to translate): {question}
-Dictionary entries retrieved (_CANONICAL_KELANTAN): {context}
-Translation output: {answer}
+Translation direction: {direction}
+Input text: {question}
+Retrieved example sentence pairs from dataset:
+{context}
+System translation output: {answer}
+
+IMPORTANT: The input and output are in DIFFERENT languages/dialects. A correct translation will look different from the input.
+- Dialect→BM: Kelantan dialect words are translated into Standard Malay
+- BM→Dialect: Standard Malay words are translated into Kelantan dialect
 
 Rate each dimension 0.0 to 1.0:
-CONTEXT_RELEVANCE: Are the retrieved dictionary entries relevant to the input text? (1.0=fully relevant, 0.0=irrelevant)
-GROUNDEDNESS: Is the translation supported by the retrieved dictionary entries? (1.0=fully grounded in dictionary, 0.0=not supported)
-ANSWER_RELEVANCE: Does the translation correctly answer the translation request? (1.0=accurate translation, 0.0=incorrect)
+CONTEXT_RELEVANCE: Do the retrieved example sentences contain words or phrases from the input text? (1.0=highly relevant, 0.0=no overlap)
+GROUNDEDNESS: Is the translation output consistent with the vocabulary shown in the example sentences? (1.0=fully consistent, 0.0=contradicts examples)
+ANSWER_RELEVANCE: Is the translation output different from the input AND a plausible translation? Score 1.0 if output differs from input and could be a valid translation. Score 0.0 only if output is identical to input or completely unrelated.
 
 Output ONLY this line, nothing else:
 CONTEXT_RELEVANCE=0.X|GROUNDEDNESS=0.X|ANSWER_RELEVANCE=0.X"""
@@ -66,15 +72,27 @@ def llm_judge(
     context: str,
     answer: str,
     mode: str = "tourism",
+    direction: str = "",
 ) -> dict[str, float]:
     try:
         from .llm import ollama_judge
-        template = _JUDGE_PROMPT_TRANSLATION if mode == "translation" else _JUDGE_PROMPT_TOURISM
-        prompt = template.format(
-            question=question,
-            context=context[:600],
-            answer=answer[:400],
-        )
+        if mode == "translation":
+            dir_label = (
+                "Bahasa Melayu Standard → Dialek Kelantan" if direction == "bm_to_dialect"
+                else "Dialek Kelantan → Bahasa Melayu Standard"
+            )
+            prompt = _JUDGE_PROMPT_TRANSLATION.format(
+                direction=dir_label,
+                question=question,
+                context=context[:600],
+                answer=answer[:400],
+            )
+        else:
+            prompt = _JUDGE_PROMPT_TOURISM.format(
+                question=question,
+                context=context[:600],
+                answer=answer[:400],
+            )
         raw = ollama_judge(prompt)
         scores = _parse_judge_scores(raw)
         return {
@@ -90,6 +108,24 @@ def llm_judge(
         }
 
 
+def _format_translation_context(contexts: list[str]) -> str:
+    """Extract clean dialek↔BM pairs from raw contoh_ayat document texts for the judge."""
+    pairs = []
+    for text in contexts[:4]:
+        dialek, bm = "", ""
+        for part in str(text).split("|"):
+            part = part.strip()
+            if part.lower().startswith("dialek_ayat:"):
+                dialek = part.split(":", 1)[1].strip()
+            elif part.lower().startswith("bm_ayat:"):
+                bm = part.split(":", 1)[1].strip()
+        if dialek and bm:
+            pairs.append(f"  Dialek: {dialek}\n  BM: {bm}")
+        elif text.strip():
+            pairs.append(f"  {text[:200]}")
+    return "\n".join(pairs) if pairs else "\n".join(c[:150] for c in contexts[:3])
+
+
 def evaluate(
     answer: str,
     contexts: list[str],
@@ -98,6 +134,7 @@ def evaluate(
     question: str = "",
     reference: str = "",
     mode: str = "tourism",
+    direction: str = "",
 ) -> dict:
     context = "\n".join(contexts)
     # ROUGE-L: compare against human reference if provided, else against retrieved context
@@ -107,6 +144,7 @@ def evaluate(
     result = {"rouge_l": round(rouge, 2)}
 
     if question and context:
-        result.update(llm_judge(question, context, answer, mode=mode))
+        judge_context = _format_translation_context(contexts) if mode == "translation" else context
+        result.update(llm_judge(question, judge_context, answer, mode=mode, direction=direction))
 
     return result

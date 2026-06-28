@@ -626,6 +626,7 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
                 question=route["normalized_query"],
                 reference=rouge_reference,
                 mode=intent,
+                direction=result.get("translation", {}).get("direction", "") if intent == "translation" else "",
             ),
             "contexts": [
                 {
