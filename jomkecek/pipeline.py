@@ -156,6 +156,63 @@ def build_tourism_items(query: str, hits) -> list[dict[str, Any]]:
     return items
 
 
+def _top_items_by_row(collection: str, limit: int = 3) -> list[dict[str, Any]]:
+    """Return the top N items from a collection sorted by row number (row 1 = most popular)."""
+    docs = load_documents()
+    domain_docs = sorted(
+        [d for d in docs if d.collection == collection],
+        key=lambda d: d.row,
+    )
+    items: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for doc in domain_docs:
+        name = _clean_item_name(
+            doc.metadata.get("nama_makanan") or doc.metadata.get("nama_tempat") or
+            doc.metadata.get("nama_budaya") or doc.metadata.get("nama") or doc.title
+        )
+        key = name.lower()
+        if not name or key in seen:
+            continue
+        seen.add(key)
+        description = doc.metadata.get("deskripsi_ringkas") or doc.metadata.get("deskripsi") or doc.text
+        items.append({
+            "name": name,
+            "district": doc.metadata.get("asal_jajahan") or doc.metadata.get("daerah", ""),
+            "category": doc.metadata.get("kategori", doc.category),
+            "description": _shorten(description),
+            "confidence": 1.0,
+        })
+        if len(items) >= limit:
+            break
+    return items
+
+
+def _is_specific_item_query(query: str) -> bool:
+    """Returns True if the query mentions a specific item name (not a general browse request)."""
+    general_words = {
+        "cadangan", "senarai", "listkan", "berikan", "apa", "apakah", "ada",
+        "mana", "semua", "popular", "terkenal", "menarik", "tradisional",
+        "kelantan", "kota bharu", "tumpat", "pasir mas"
+    }
+    tokens = set(query.lower().split())
+    # If mostly general words and no proper noun hint, treat as general query
+    specific = tokens - general_words
+    return len(specific) >= 3  # has 3+ specific non-general words = likely specific item
+
+
+def _merge_with_top(top_items: list, hit_items: list, total: int = 4) -> list:
+    """Merge top-by-row items first, then fill with retrieval hits, deduplicating."""
+    seen = {item["name"].lower() for item in top_items}
+    result = list(top_items)
+    for item in hit_items:
+        if item["name"].lower() not in seen:
+            seen.add(item["name"].lower())
+            result.append(item)
+        if len(result) >= total:
+            break
+    return result[:total]
+
+
 def validate_context_relevance(query: str, hit, intent: str, answer_type: str) -> bool:
     if not hit:
         return False
@@ -429,15 +486,26 @@ _DOMAIN_COLLECTIONS = {"makanan_tradisional", "tempat_menarik", "budaya"}
 def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -> dict[str, Any]:
     intent = route.get("intent", "")
 
-    # For the 3 primary domains, always use dataset documents if any matching records exist.
-    # Never fall back to LLM for makanan/tempat/budaya as long as relevant docs are found.
+    # For the 3 primary domains, always use dataset documents first.
+    # General queries → top-3 by row (most popular) + retrieval hits.
+    # Specific item queries → retrieval hits only (relevance matters more).
     if intent in _DOMAIN_COLLECTIONS:
         domain_hits = [h for h in hits if h.document.collection == intent]
         if not domain_hits:
-            # No domain docs found at all — try any hits from the right collection
             domain_hits = [h for h in hits if h.document.collection in _DOMAIN_COLLECTIONS]
-        if domain_hits:
-            items = build_tourism_items(query, domain_hits)
+
+        is_specific = _is_specific_item_query(query)
+
+        if domain_hits or not is_specific:
+            hit_items = build_tourism_items(query, domain_hits) if domain_hits else []
+
+            if not is_specific:
+                # General query — lead with top-3 most popular from Excel, then fill with hits
+                top_items = _top_items_by_row(intent, limit=3)
+                items = _merge_with_top(top_items, hit_items, total=4)
+            else:
+                items = hit_items
+
             if items:
                 return {
                     "response_type": intent,
@@ -447,7 +515,7 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
                     "llm_note": "",
                     "used_llm": False,
                 }
-            # Docs found but no card items (e.g. detail/reasoning query) — use doc text via LLM
+            # Docs found but no card items (detail/reasoning query) — use doc text via LLM
             note = generate_answer_by_type(query, domain_hits, route, answer_type)
             return {
                 "response_type": "general",
