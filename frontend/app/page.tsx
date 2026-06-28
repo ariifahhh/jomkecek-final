@@ -121,7 +121,7 @@ const kelantanPrompts = [
   "Cadangan makanan tradisional Kelantan",
   "Tempat menarik di Kota Bharu",
   "Apa budaya terkenal di Kelantan?",
-  "Mengapakah Kelantan dipanggil Serambi Mekah?",
+  "Ceritakan tentang Wayang Kulit Kelantan",
   "Apa gelaran negeri Kelantan?",
 ];
 
