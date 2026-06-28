@@ -248,20 +248,19 @@ function renderAnswer(result: ChatResult) {
   return <p>{result.answer}</p>;
 }
 
+const bakuExamples = [
+  { from: "nk g", to: "NAK PERGI" },
+  { from: "xde", to: "TIADA" },
+  { from: "dh mkn", to: "SUDAH MAKAN" },
+  { from: "sbb ape", to: "SEBAB APA" },
+];
+
 const imbuhanExamples = [
   { from: "diambil", to: "DI AMBIL" },
   { from: "berjalan", to: "BER JALAN" },
   { from: "macamtu", to: "MACAM TU" },
   { from: "takpayah", to: "TAK PAYAH" },
   { from: "gituah", to: "GITU LAH" },
-];
-
-const bakuExamples = [
-  { from: "nk g", to: "NAK PERGI" },
-  { from: "xde", to: "TIADA" },
-  { from: "dh mkn", to: "SUDAH MAKAN" },
-  { from: "sbb ape", to: "SEBAB APA" },
-  { from: "btol ke", to: "BETUL KE" },
 ];
 
 function TipsTerjemahan() {
@@ -283,15 +282,20 @@ function TipsTerjemahan() {
       {open && (
         <div className="tips-body">
           <div className="tip-section">
-            <h3><span className="tip-num tip-num-blue">01.</span> Nama Khas &amp; Kata Nama Khas</h3>
-            <p>
-              Untuk mengelakkan <strong>Nama Orang</strong> atau <strong>Nama Tempat</strong> diterjemahkan secara salah,
-              mulakan perkataan dengan <strong>Huruf Besar</strong> di hadapan. Sistem akan mengabaikan terjemahan bagi perkataan tersebut.
-            </p>
+            <h3><span className="tip-num tip-num-blue">01.</span> Bahasa Melayu Standard &amp; Ejaan Betul</h3>
+            <p>Gunakan <strong>Bahasa Melayu standard</strong> dan pastikan ejaan betul supaya sistem dapat mengenal pasti maksud perkataan dengan lebih tepat. Elakkan singkatan atau bahasa sembang (Contoh):</p>
+            <div className="tip-examples">
+              {bakuExamples.map((ex) => (
+                <div key={ex.from} className="tip-ex-card tip-ex-yellow">
+                  <span className="tip-ex-from">{ex.from}</span>
+                  <span className="tip-ex-to">{ex.to}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="tip-section">
             <h3><span className="tip-num tip-num-teal">02.</span> Pisahkan Perkataan (Imbuhan)</h3>
-            <p>Sangat disyorkan untuk memisahkan perkataan dengan <strong>jarak (space)</strong> bagi mendapatkan terjemahan yang lebih tepat (Contoh):</p>
+            <p>Gunakan <strong>jarak (space)</strong> antara perkataan atau imbuhan yang digabungkan bagi membantu sistem memahami struktur perkataan (Contoh):</p>
             <div className="tip-examples">
               {imbuhanExamples.map((ex) => (
                 <div key={ex.from} className="tip-ex-card tip-ex-blue">
@@ -302,15 +306,17 @@ function TipsTerjemahan() {
             </div>
           </div>
           <div className="tip-section">
-            <h3><span className="tip-num tip-num-blue">03.</span> Gunakan Bahasa Melayu Baku</h3>
-            <p>Gunakan official <strong>&apos;Bahasa Baku&apos;</strong> dalam Bahasa Melayu untuk terjemahan lebih tepat. Elakkan menggunakan &apos;slang&apos; atau singkatan (Contoh):</p>
+            <h3><span className="tip-num tip-num-blue">03.</span> Gunakan Ayat Lengkap</h3>
+            <p>Gunakan ayat yang mempunyai <strong>konteks</strong> supaya sistem dapat memahami maksud sebenar sebelum menterjemahkan.</p>
             <div className="tip-examples">
-              {bakuExamples.map((ex) => (
-                <div key={ex.from} className="tip-ex-card tip-ex-yellow">
-                  <span className="tip-ex-from">{ex.from}</span>
-                  <span className="tip-ex-to">{ex.to}</span>
-                </div>
-              ))}
+              <div className="tip-ex-card tip-ex-yellow">
+                <span className="tip-ex-from">❌ gi mano</span>
+                <span className="tip-ex-to">KURANG KONTEKS</span>
+              </div>
+              <div className="tip-ex-card tip-ex-blue">
+                <span className="tip-ex-from">✅ Awak pergi mana?</span>
+                <span className="tip-ex-to">LEBIH TEPAT</span>
+              </div>
             </div>
           </div>
         </div>
