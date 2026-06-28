@@ -423,28 +423,69 @@ Jika melibatkan fakta spesifik (nama orang, nama tempat, angka), nyatakan bahawa
     }
 
 
+_DOMAIN_COLLECTIONS = {"makanan_tradisional", "tempat_menarik", "budaya"}
+
+
 def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -> dict[str, Any]:
+    intent = route.get("intent", "")
+
+    # For the 3 primary domains, always use dataset documents if any matching records exist.
+    # Never fall back to LLM for makanan/tempat/budaya as long as relevant docs are found.
+    if intent in _DOMAIN_COLLECTIONS:
+        domain_hits = [h for h in hits if h.document.collection == intent]
+        if not domain_hits:
+            # No domain docs found at all — try any hits from the right collection
+            domain_hits = [h for h in hits if h.document.collection in _DOMAIN_COLLECTIONS]
+        if domain_hits:
+            items = build_tourism_items(query, domain_hits)
+            if items:
+                return {
+                    "response_type": intent,
+                    "summary": "Maklumat daripada pangkalan data JomKecek.",
+                    "items": items,
+                    "sections": items,
+                    "llm_note": "",
+                    "used_llm": False,
+                }
+            # Docs found but no card items (e.g. detail/reasoning query) — use doc text via LLM
+            note = generate_answer_by_type(query, domain_hits, route, answer_type)
+            return {
+                "response_type": "general",
+                "summary": note,
+                "items": [],
+                "sections": [],
+                "llm_note": note,
+                "used_llm": True,
+            }
+        # Truly no docs for this domain — inform user rather than hallucinate
+        no_data = (
+            f"Maaf, maklumat tentang {query} tidak ditemui dalam pangkalan data JomKecek buat masa ini."
+        )
+        return {
+            "response_type": "no_data",
+            "summary": no_data,
+            "items": [],
+            "sections": [],
+            "llm_note": no_data,
+            "used_llm": False,
+        }
+
+    # General / unknown intent — existing RAG-then-LLM logic
     if not validate_rag_context(route, hits, answer_type):
-        # RAG tak jumpa — guna LLM terus untuk soalan umum Kelantan
         return answer_with_llm_knowledge(query)
 
-    if route.get("intent") == "unknown" and answer_type not in {"reasoning", "detail"}:
+    if intent == "unknown" and answer_type not in {"reasoning", "detail"}:
         return answer_with_llm_knowledge(query)
 
-    # Cards only for recommendation/direct list queries — NOT for "ceritakan/huraikan" which should use LLM prose
+    # Cards only for recommendation/direct list queries — NOT for "ceritakan/huraikan"
     card_query = answer_type == "recommendation" or (
         answer_type not in {"detail", "reasoning"}
         and any(word in query.lower() for word in ("tempat", "makanan", "budaya", "pantai", "pasar", "cadangkan"))
     )
     items = build_tourism_items(query, hits) if card_query else []
     if items:
-        response_type = "tempat_menarik"
-        if route.get("intent") == "makanan_tradisional":
-            response_type = "makanan_tradisional"
-        elif route.get("intent") == "budaya":
-            response_type = "budaya"
         return {
-            "response_type": response_type,
+            "response_type": "general",
             "summary": "Cadangan ringkas berdasarkan konteks JomKecek.",
             "items": items,
             "sections": items,
@@ -456,7 +497,7 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
     return {
         "response_type": "general",
         "summary": note,
-        "items": items,
+        "items": [],
         "sections": [],
         "llm_note": note,
         "used_llm": True,
