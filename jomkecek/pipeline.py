@@ -20,7 +20,7 @@ def _get_dialect_examples(matched_words: list[str]) -> tuple[list[dict], list]:
     if not matched_words:
         return [], []
     query = " ".join(matched_words[:4])
-    hits = retrieve(query, top_k=4, collections={"dialect_sentences"})
+    hits = retrieve(query, top_k=4, collections={"contoh_ayat"})
     examples = []
     for hit in hits[:3]:
         meta = hit.document.metadata
@@ -611,6 +611,7 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
                 max(confidence, LOW_RETRIEVAL_CONFIDENCE if hits else 0),
                 strict,
                 question=route["normalized_query"],
+                mode=intent,
             ),
             "contexts": [
                 {

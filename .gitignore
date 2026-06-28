@@ -28,3 +28,9 @@ frontend/out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Documentation files (not part of the app)
+D5_*.md
+D6_*.md
+D7_*.md
+*.pdf

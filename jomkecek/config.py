@@ -20,8 +20,8 @@ LOW_RETRIEVAL_CONFIDENCE = 0.28
 DEFAULT_TOP_K = 6
 
 COLLECTIONS = {
-    "dialect_words": {"perkataan"},
-    "dialect_sentences": {"contoh_ayat"},
+    "perkataan": {"perkataan"},
+    "contoh_ayat": {"contoh_ayat"},
     "tempat_menarik": {"tempat_menarik"},
     "makanan_tradisional": {"makanan_tradisional"},
     "budaya": {"budaya"},

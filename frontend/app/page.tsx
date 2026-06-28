@@ -610,7 +610,7 @@ export default function HomePage() {
     <main className={`jk-shell${view === "chat" ? " chat-mode" : ""}`}>
       <aside className="jk-sidebar">
         <div className="brand">
-          <img src={`${API_BASE}/assets/kijang_bukamata.png`} alt="" />
+          <img src="/kijang_bukamata.png" alt="" />
           <div>
             <strong>JomKecek</strong>
             <span>Panduan AI Kelantan</span>
@@ -673,7 +673,7 @@ export default function HomePage() {
                   </button>
                 </div>
               </div>
-              <img src={`${API_BASE}/assets/kijang_bukamata.png`} alt="JomKecek mascot" />
+              <img src="/kijang_bukamata.png" alt="JomKecek maskot" />
             </article>
 
             <div className="landing-grid">

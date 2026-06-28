@@ -62,7 +62,7 @@ def route_query(query: str, selected_mode: str = "Terjemahan Dialek") -> dict:
             "mode": "dialect_translation",
             "intent": "dialect",
             "normalized_query": normalized,
-            "collection_filter": ["dialect_words", "dialect_phrases", "dialect_sentences"],
+            "collection_filter": ["perkataan", "dialect_phrases", "contoh_ayat"],
         }
 
     # selected_mode == "Info Kelantan"

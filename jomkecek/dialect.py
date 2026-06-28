@@ -190,7 +190,7 @@ def _dialect_dict() -> dict[str, dict]:
     from .data import load_documents
     result: dict[str, dict] = {}
     for doc in load_documents():
-        if doc.collection != "dialect_words":
+        if doc.collection != "perkataan":
             continue
         meta = doc.metadata
         dialek_raw = meta.get("dialek_perkataan", "").strip()
@@ -211,7 +211,7 @@ def _known_sentences() -> dict[str, str]:
     from .data import load_documents
     result: dict[str, str] = {}
     for doc in load_documents():
-        if doc.collection != "dialect_sentences":
+        if doc.collection != "contoh_ayat":
             continue
         meta = doc.metadata
         dialek = normalize_text(meta.get("dialek_ayat", ""))
@@ -227,7 +227,7 @@ def _bm_to_dialect() -> dict[str, dict]:
     from .data import load_documents
     result: dict[str, dict] = {}
     for doc in load_documents():
-        if doc.collection != "dialect_words":
+        if doc.collection != "perkataan":
             continue
         meta = doc.metadata
         dialek_raw = meta.get("dialek_perkataan", "").strip()
