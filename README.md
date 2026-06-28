@@ -2,7 +2,7 @@
 
 JomKecek is a hybrid RAG chatbot for Kelantan dialect translation, tourism, food, culture and general knowledge about Kelantan. Built as a Final Year Project (FYP) using Next.js 14, FastAPI and a locally-hosted Malaysian LLM.
 
-**Live demo:** [jomkecek-final.vercel.app](https://jomkecek-final.vercel.app) *(frontend — requires backend running locally or via ngrok)*
+**Live demo:** [jomkecek.vercel.app](https://jomkecek.vercel.app) *(frontend — requires backend running locally or via ngrok)*
 
 ---
 
