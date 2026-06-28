@@ -132,7 +132,7 @@ const catalogFilters = [
   { label: "Budaya", value: "culture" }
 ];
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 
 function MetricBar({ label, value }: { label: string; value: number | string | undefined }) {
   if (typeof value !== "number") {
@@ -488,15 +488,17 @@ export default function HomePage() {
     culture: catalog.filter((item) => item.collection === "culture").length,
   }), [catalog]);
 
-  const filteredCatalog = useMemo(
-    () => catalog.filter((item) => {
-      if (catalogFilter !== "all" && item.collection !== catalogFilter) return false;
-      if (!catalogSearch) return true;
-      const q = catalogSearch.toLowerCase();
-      return item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
-    }),
-    [catalog, catalogFilter, catalogSearch]
-  );
+  const filteredCatalog = useMemo(() => {
+    const rowOf = (id: string) => parseInt(id.split("-").pop() ?? "9999", 10);
+    return catalog
+      .filter((item) => {
+        if (catalogFilter !== "all" && item.collection !== catalogFilter) return false;
+        if (!catalogSearch) return true;
+        const q = catalogSearch.toLowerCase();
+        return item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+      })
+      .sort((a, b) => rowOf(a.id) - rowOf(b.id));
+  }, [catalog, catalogFilter, catalogSearch]);
 
   const totalPages = Math.ceil(filteredCatalog.length / ITEMS_PER_PAGE);
   const pagedCatalog = useMemo(
