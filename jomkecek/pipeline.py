@@ -494,17 +494,12 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
         if not domain_hits:
             domain_hits = [h for h in hits if h.document.collection in _DOMAIN_COLLECTIONS]
 
-        is_specific = _is_specific_item_query(query)
-
-        if domain_hits or not is_specific:
+        if domain_hits or True:
             hit_items = build_tourism_items(query, domain_hits) if domain_hits else []
 
-            if not is_specific:
-                # General query — lead with top-3 most popular from Excel, then fill with hits
-                top_items = _top_items_by_row(intent, limit=3)
-                items = _merge_with_top(top_items, hit_items, total=4)
-            else:
-                items = hit_items
+            # Always lead with top-3 most popular (by row order in Excel), then fill with retrieval hits
+            top_items = _top_items_by_row(intent, limit=3)
+            items = _merge_with_top(top_items, hit_items, total=4)
 
             if items:
                 return {
