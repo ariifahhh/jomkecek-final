@@ -323,17 +323,22 @@ const tipsPelanconganItems = [
   {
     num: "01", color: "blue" as const,
     title: "Gunakan Nama Spesifik",
-    body: <>Nyatakan nama <strong>tempat, makanan atau acara</strong> yang tepat untuk jawapan lebih terperinci. Contoh: <em>"Ceritakan tentang Pantai Cahaya Bulan"</em> lebih baik daripada <em>"pantai Kelantan"</em>.</>,
+    body: <>Nyatakan nama <strong>tempat, makanan atau acara</strong> yang tepat untuk jawapan lebih terperinci. Contoh: <em>"Ceritakan tentang Pantai Cahaya Bulan"</em>.</>,
   },
   {
     num: "02", color: "teal" as const,
-    title: "Kata Tanya → Penerangan",
-    body: <>Gunakan <strong>apa, di mana, kenapa, bagaimana</strong> atau <strong>ceritakan</strong> untuk mendapat jawapan berbentuk <strong>naratif</strong> yang menjelaskan dengan lanjut.</>,
+    title: "Tanya Fakta Kelantan",
+    body: <>Gunakan soalan terus untuk mendapatkan maklumat ringkas dan tepat. Contoh: <em>"Apakah ibu negeri Kelantan?"</em></>,
   },
   {
     num: "03", color: "blue" as const,
-    title: "\"Senaraikan\" → Senarai Pilihan",
-    body: <>Gunakan perkataan <strong>senaraikan, listkan</strong> atau <strong>berikan</strong> untuk mendapat beberapa pilihan sekaligus. Contoh: <em>"Senaraikan tempat menarik di Kota Bharu"</em>.</>,
+    title: "Minta Cadangan",
+    body: <>Gunakan perkataan seperti <strong>cadangan, senaraikan</strong> atau <strong>berikan</strong> untuk mendapatkan beberapa pilihan. Contoh: <em>"Senaraikan tempat menarik di Kota Bharu"</em>.</>,
+  },
+  {
+    num: "04", color: "teal" as const,
+    title: "Minta Penerangan",
+    body: <>Gunakan perkataan seperti <strong>ceritakan, terangkan, huraikan</strong> atau <strong>bagaimana</strong> untuk mendapatkan penerangan lanjut. Contoh: <em>"Ceritakan tentang Wayang Kulit Kelantan"</em>.</>,
   },
 ];
 
@@ -341,17 +346,17 @@ const kawalanSkopItems = [
   {
     icon: "🗺️",
     title: "Terhad kepada Kelantan",
-    body: "Sistem hanya melayan soalan berkaitan Kelantan. Pertanyaan tentang negeri atau negara lain tidak akan dilayan.",
+    body: "Sistem hanya menyediakan maklumat berkaitan Kelantan. Pertanyaan tentang negeri atau negara lain tidak akan dilayan.",
   },
   {
-    icon: "🔍",
-    title: "Hybrid RAG",
-    body: "Jika maklumat wujud dalam dataset tempatan → jawapan bersumberkan RAG. Jika tiada → LLM digunakan dengan kawalan ketat supaya kekal dalam skop Kelantan.",
+    icon: "📚",
+    title: "Skop Maklumat",
+    body: "JomKecek meliputi makanan tradisional, budaya dan warisan, tempat menarik serta fakta umum Kelantan.",
   },
   {
-    icon: "📋",
-    title: "Format Jawapan Adaptif",
-    body: "Kata tanya (apa, di mana, ceritakan) → penerangan naratif. Kata arahan (senaraikan, berikan) atau tiada kata tanya → jawapan dalam bentuk senarai.",
+    icon: "💡",
+    title: "Sumber Jawapan",
+    body: "Maklumat daripada pangkalan data JomKecek digunakan apabila tersedia. Jika tiada, AI akan menjawab dengan memastikan kandungan kekal dalam skop Kelantan.",
   },
 ];
 
