@@ -809,6 +809,8 @@ export default function HomePage() {
               {mode === "Terjemahan Dialek" && <TipsTerjemahan />}
               {mode === "Info Kelantan" && <TipsPelancongan />}
               {mode === "Info Kelantan" && <KawalanSkop />}
+              {/* ROUGE-L and Triad RAG hidden from UI — scores still computed by backend */}
+              {/* Uncomment to re-enable evaluation panel:
               <section>
                 <h2><BarChart3 size={18} /> ROUGE-L</h2>
                 <p className="metric-desc">Mengukur padanan token antara jawapan chatbot dengan konteks sumber yang ditemui.</p>
@@ -825,6 +827,7 @@ export default function HomePage() {
                   <MetricBar label="Kerelevanan Jawapan" value={lastResult?.eval?.judge_answer_relevance} />
                 </div>
               </section>
+              */}
             </aside>
             </div>
           </>
