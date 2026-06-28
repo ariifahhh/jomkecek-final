@@ -483,9 +483,9 @@ export default function HomePage() {
   }, [history]);
 
   const catalogStats = useMemo(() => ({
-    tourism: catalog.filter((item) => item.collection === "tourism").length,
-    food: catalog.filter((item) => item.collection === "food").length,
-    culture: catalog.filter((item) => item.collection === "culture").length,
+    tourism: catalog.filter((item) => item.collection === "tempat_menarik").length,
+    food: catalog.filter((item) => item.collection === "makanan_tradisional").length,
+    culture: catalog.filter((item) => item.collection === "budaya").length,
   }), [catalog]);
 
   const filteredCatalog = useMemo(() => {
