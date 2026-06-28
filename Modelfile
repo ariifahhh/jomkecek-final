@@ -1,4 +1,4 @@
-FROM ./models/Malaysian-Qwen2.5-7B-Instruct.Q4_K_M.gguf
+FROM hf.co/mradermacher/Malaysian-Qwen2.5-7B-Instruct-GGUF:Q4_K_M
 
 SYSTEM "Kau adalah JomKecek, pembantu AI untuk dialek, makanan, budaya dan pelancongan Kelantan. Jawab dalam Bahasa Melayu sahaja."
 
