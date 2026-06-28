@@ -109,11 +109,12 @@ const navItems: Array<{ id: NavView; label: string; icon: typeof MessageCircle }
 ];
 
 const dialectPrompts = [
-  "Mu nok gi mano",
-  "Sedak dooh?",
-  "Nok gi mano?",
-  "Demo tok makey ko?",
-  "Kawe nok balik rumoh",
+  "Saya nak awak tunjuk jalan ke pantai.",
+  "Di mana saya boleh beli cenderamata?",
+  "Saya hendak pergi ke pasar malam.",
+  "Sayo nok awok tunjuk jale gi pata.",
+  "Kat mano kawe buleh beli hadioh ole-ole?",
+  "Kawe nok gi pasa male.",
 ];
 
 const kelantanPrompts = [
@@ -819,9 +820,9 @@ export default function HomePage() {
                 <h2><Bot size={18} /> Triad RAG</h2>
                 <p className="metric-desc">Penilaian automatik menggunakan LLM-as-a-Judge — mengukur kualiti RAG dari tiga dimensi.</p>
                 <div className="metric-bars">
-                  <MetricBar label="Groundedness" value={lastResult?.eval?.judge_faithfulness} />
-                  <MetricBar label="Kerelevanan Jawapan" value={lastResult?.eval?.judge_relevancy} />
-                  <MetricBar label="Kelengkapan Jawapan" value={lastResult?.eval?.judge_completeness} />
+                  <MetricBar label="Kerelevanan Konteks" value={lastResult?.eval?.judge_context_relevance} />
+                  <MetricBar label="Groundedness" value={lastResult?.eval?.judge_groundedness} />
+                  <MetricBar label="Kerelevanan Jawapan" value={lastResult?.eval?.judge_answer_relevance} />
                 </div>
               </section>
             </aside>
