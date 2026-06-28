@@ -495,6 +495,18 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
             domain_hits = [h for h in hits if h.document.collection in _DOMAIN_COLLECTIONS]
 
         if domain_hits or True:
+            # detail/reasoning queries → LLM prose response, not cards
+            if answer_type in {"detail", "reasoning"} and domain_hits:
+                note = generate_answer_by_type(query, domain_hits, route, answer_type)
+                return {
+                    "response_type": "general",
+                    "summary": note,
+                    "items": [],
+                    "sections": [],
+                    "llm_note": note,
+                    "used_llm": True,
+                }
+
             hit_items = build_tourism_items(query, domain_hits) if domain_hits else []
 
             # Always lead with top-3 most popular (by row order in Excel), then fill with retrieval hits
@@ -510,7 +522,7 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
                     "llm_note": "",
                     "used_llm": False,
                 }
-            # Docs found but no card items (detail/reasoning query) — use doc text via LLM
+            # Fallback prose if no card items found
             note = generate_answer_by_type(query, domain_hits, route, answer_type)
             return {
                 "response_type": "general",
