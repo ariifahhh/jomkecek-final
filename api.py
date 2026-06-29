@@ -138,7 +138,9 @@ def catalog() -> dict[str, list[dict[str, str | int]]]:
         seen.add(key)
         district = _title_case_ms(doc.metadata.get("asal_jajahan") or doc.metadata.get("daerah") or "")
         description = _sentence_case(_catalog_description(doc.metadata, doc.text))
-        image_keyword = re.sub(r"\s+", " ", re.sub(r"\([^)]*\)", "", name)).strip()
+        base_keyword = re.sub(r"\s+", " ", re.sub(r"\([^)]*\)", "", name)).strip()
+        location = f"{district} Kelantan" if district else "Kelantan"
+        image_keyword = f"{base_keyword} {location}"
         items.append(
             {
                 "id": f"{doc.collection}-{doc.row}",
@@ -251,8 +253,10 @@ def images(payload: ImageSearchRequest) -> dict[str, list[dict[str, str]]]:
         no_parens = re.sub(r"\s+", " ", no_parens).strip()
         words = no_parens.split()
         short = " ".join(words[:3]) if len(words) > 3 else ""
+        # Add "Malaysia" fallback for short queries that dropped location context
+        short_with_country = f"{short} Malaysia" if short and "Malaysia" not in short and "Kelantan" not in short else ""
         seen_v: list[str] = []
-        for v in [full, no_parens, short]:
+        for v in [full, no_parens, short, short_with_country]:
             if v and v not in seen_v:
                 seen_v.append(v)
         return seen_v
