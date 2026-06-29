@@ -11,6 +11,7 @@ import {
   Compass,
   Copy,
   Database,
+  Drama,
   Home,
   Lightbulb,
   Loader2,
@@ -23,6 +24,7 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  UtensilsCrossed,
   User
 } from "lucide-react";
 
@@ -109,12 +111,11 @@ const navItems: Array<{ id: NavView; label: string; icon: typeof MessageCircle }
 ];
 
 const dialectPrompts = [
-  "Saya nak awak tunjuk jalan ke pantai.",
-  "Di mana saya boleh beli cenderamata?",
-  "Saya hendak pergi ke pasar malam.",
-  "Sayo nok awok tunjuk jale gi pata.",
-  "Kat mano kawe buleh beli hadioh ole-ole?",
-  "Kawe nok gi pasa male.",
+  "Kawe nok make nasi keghabu hok sedak.",
+  "Kat mano kawe buleh beli cenderamato?",
+  "Buleh kughe ghego lagi ko?",
+  "Terima kasih kerana membantu saya.",
+  "Saya mahu tengok persembahan dikir barat.",
 ];
 
 const kelantanPrompts = [
@@ -444,12 +445,13 @@ export default function HomePage() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [showPrompts, setShowPrompts] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       role: "assistant",
-      content: "Assalamualaikum. Saya JomKecek, pembantu untuk dialek, makanan, budaya dan pelancongan Kelantan."
+      content: "Hi! Saya JomKecek, pembantu anda untuk dialek dan pelancongan Kelantan. Nak belajar cakap Kelantan atau cari info tempat menarik di Kelantan? Jom saya bantu!"
     }
   ]);
 
@@ -459,12 +461,14 @@ export default function HomePage() {
   );
 
 
-  useEffect(() => {
+  const fetchMetrics = () => {
     fetch(`${API_BASE}/metrics`)
-      .then((response) => response.json())
-      .then(setMetrics)
-      .catch(() => setMetrics(null));
-  }, []);
+      .then((r) => r.json())
+      .then((data) => { if (typeof data.documents === "number") setMetrics(data); })
+      .catch(() => {});
+  };
+
+  useEffect(() => { fetchMetrics(); }, []);
 
   useEffect(() => {
     fetch(`${API_BASE}/catalog`)
@@ -734,14 +738,27 @@ export default function HomePage() {
             </div>
             <div className="chat-workspace">
             <section className="chat-panel">
-              <div className="prompt-row">
-                {(mode === "Terjemahan Dialek" ? dialectPrompts : kelantanPrompts).map((prompt) => (
-                  <button key={prompt} type="button" onClick={() => submitPrompt(prompt)}>
-                    <Sparkles size={15} />
-                    {prompt}
-                  </button>
-                ))}
+              <div className="prompt-row-header">
+                <span className="prompt-row-label"><Sparkles size={14} /> Cadangan</span>
+                <button
+                  className="prompt-row-toggle"
+                  type="button"
+                  aria-label="Togol cadangan"
+                  onClick={() => setShowPrompts((v) => !v)}
+                >
+                  {showPrompts ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                </button>
               </div>
+              {showPrompts && (
+                <div className="prompt-row">
+                  {(mode === "Terjemahan Dialek" ? dialectPrompts : kelantanPrompts).map((prompt) => (
+                    <button key={prompt} type="button" onClick={() => submitPrompt(prompt)}>
+                      <Sparkles size={15} />
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="messages">
                 {messages.map((message) => {
                   const relatedForMsg = message.role === "assistant" && message.result?.contexts?.length
@@ -785,7 +802,7 @@ export default function HomePage() {
                               {relatedForMsg.map(item => (
                                 <button key={item.id} type="button" className="inline-related-btn" onClick={() => submitPrompt(item.prompt, "Info Kelantan")}>
                                   <span className={`item-badge badge-${item.collection}`}>
-                                    {item.collection === "tourism" ? "Tempat" : item.collection === "food" ? "Makanan" : "Budaya"}
+                                    {item.collection === "tempat_menarik" ? <><MapPinned size={11} /> Tempat</> : item.collection === "makanan_tradisional" ? <><UtensilsCrossed size={11} /> Makanan</> : <><Drama size={11} /> Budaya</>}
                                   </span>
                                   {item.name}
                                 </button>
@@ -811,7 +828,7 @@ export default function HomePage() {
               </div>
               <form className="composer" onSubmit={onSubmit}>
                 <Search size={18} />
-                <input value={input} onChange={(event) => setInput(event.target.value)} placeholder={mode === "Terjemahan Dialek" ? "Taip ayat dialek Kelantan untuk diterjemah..." : "Taip soalan tentang Kelantan..."} />
+                <input value={input} onChange={(event) => setInput(event.target.value)} placeholder={mode === "Terjemahan Dialek" ? "Taip ayat untuk diterjemah sahaja..." : "Taip soalan tentang Kelantan..."} />
                 <button disabled={loading || !input.trim()} type="submit" aria-label="Hantar">
                   <Send size={18} />
                 </button>
@@ -875,9 +892,9 @@ export default function HomePage() {
               </div>
               <div className="catalog-toolbar-bottom">
                 <div className="catalog-stats">
-                  <span className="stat-pill badge-tourism">{catalogStats.tourism} Tempat</span>
-                  <span className="stat-pill badge-food">{catalogStats.food} Makanan</span>
-                  <span className="stat-pill badge-culture">{catalogStats.culture} Budaya</span>
+                  <span className="stat-pill badge-tourism"><MapPinned size={12} />{catalogStats.tourism} Tempat</span>
+                  <span className="stat-pill badge-food"><UtensilsCrossed size={12} />{catalogStats.food} Makanan</span>
+                  <span className="stat-pill badge-culture"><Drama size={12} />{catalogStats.culture} Budaya</span>
                 </div>
                 <p className="catalog-count">
                   {filteredCatalog.length > 0
@@ -916,15 +933,18 @@ export default function HomePage() {
                             onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
                           />
                         : (
-                          <div className="catalog-no-image">
-                            <MapPinned size={30} />
+                          <div className={`catalog-no-image catalog-icon--${item.collection}`}>
+                            {item.collection === "makanan_tradisional" ? <UtensilsCrossed size={30} /> : item.collection === "budaya" ? <Drama size={30} /> : <MapPinned size={30} />}
                             <span>{item.category}</span>
                           </div>
                         )
                       }
                     </div>
                     <div className="explore-item-body">
-                      <span className={`item-badge badge-${item.collection}`}>{item.category}{item.district ? ` / ${item.district}` : ""}</span>
+                      <span className={`item-badge badge-${item.collection}`}>
+                        {item.collection === "tempat_menarik" ? <MapPinned size={11} /> : item.collection === "makanan_tradisional" ? <UtensilsCrossed size={11} /> : <Drama size={11} />}
+                        {item.category}{item.district ? ` / ${item.district}` : ""}
+                      </span>
                       <h2>{item.name}</h2>
                       <p>{item.description}</p>
                       <button type="button" onClick={() => submitPrompt(item.prompt, "Info Kelantan")}>

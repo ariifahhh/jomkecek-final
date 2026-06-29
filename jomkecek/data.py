@@ -81,11 +81,17 @@ def load_documents() -> list[RagDocument]:
     else:
         xls = pd.ExcelFile(path)
         for sheet in xls.sheet_names:
-            df = pd.read_excel(path, sheet_name=sheet)
+            try:
+                df = pd.read_excel(path, sheet_name=sheet)
+            except Exception:
+                continue
             for i, row in df.iterrows():
-                doc = _row_to_doc(row, sheet.lower(), i + 1)
-                if doc:
-                    docs.append(doc)
+                try:
+                    doc = _row_to_doc(row, sheet.lower(), i + 1)
+                    if doc:
+                        docs.append(doc)
+                except Exception:
+                    continue
 
     return docs
 

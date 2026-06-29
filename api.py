@@ -63,11 +63,11 @@ def health() -> dict[str, str]:
 
 
 @app.get("/metrics")
-def metrics() -> dict:
+async def metrics() -> dict:
     try:
         return get_metrics()
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except Exception:
+        return {"documents": 0, "categories": [], "collections": [], "model": "", "dataset": "DATA_JOMKECEK_CLEANED"}
 
 
 def _catalog_description(metadata: dict[str, str], fallback: str) -> str:

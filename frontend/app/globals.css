@@ -245,7 +245,7 @@ button {
 
 .chat-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 260px;
   gap: 18px;
   align-items: stretch;
 }
@@ -367,9 +367,19 @@ button {
 
 .chat-panel {
   min-height: calc(100vh - 174px);
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+}
+
+.chat-panel .messages {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.chat-panel .composer {
+  flex-shrink: 0;
 }
 
 /* ── Chat-mode: lock layout to viewport so messages scroll inside, not browser ── */
@@ -388,10 +398,27 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 
 .jk-shell.chat-mode .topline {
   flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.jk-shell.chat-mode .topline .eyebrow {
+  display: none;
+}
+
+.jk-shell.chat-mode .topline h1 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .jk-shell.chat-mode .chat-mode-switch {
@@ -483,11 +510,51 @@ button {
   color: var(--maroon);
 }
 
+.prompt-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.prompt-row-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.prompt-row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.prompt-row-toggle:hover {
+  background: rgba(110, 19, 15, 0.07);
+  color: var(--maroon);
+}
+
 .prompt-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 16px;
+  padding: 10px 16px 14px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -1098,6 +1165,7 @@ button {
 .stat-pill {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   height: 22px;
   padding: 0 10px;
   border-radius: 999px;
@@ -1164,6 +1232,10 @@ button {
   opacity: 0.45;
 }
 
+.catalog-icon--tempat_menarik { color: var(--green); }
+.catalog-icon--makanan_tradisional { color: var(--clay); }
+.catalog-icon--budaya { color: var(--maroon); }
+
 .catalog-no-image span {
   font-size: 11px;
   font-weight: 900;
@@ -1181,6 +1253,7 @@ button {
 .item-badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   align-self: start;
   height: 22px;
   padding: 0 9px;
@@ -1209,6 +1282,10 @@ button {
   color: var(--maroon);
   background: rgba(110, 19, 15, 0.08);
 }
+
+.badge-tempat_menarik { color: var(--green); background: rgba(73, 101, 79, 0.12); }
+.badge-makanan_tradisional { color: var(--clay); background: rgba(181, 106, 63, 0.12); }
+.badge-budaya { color: var(--maroon); background: rgba(110, 19, 15, 0.08); }
 
 .explore-item-body h2 {
   margin: 0;
