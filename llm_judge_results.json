@@ -1,0 +1,413 @@
+{
+  "KU-01": [
+    {
+      "id": 1,
+      "query": "sayo nok awok tunjuk jale gi pata",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya ingin anda tunjukkan jalan ke pantai\n\nPecahan\n- sayo -> tiada dalam pangkalan data\n- nok -> hendak / nak\n- awok -> tiada dalam pangkalan data\n- tunjuk -> tiada dalam pangkalan data\n- jale -> jalan\n- gi -> pergi\n- pata -> pantai\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 2,
+      "query": "sayo nok awok tunjuk jale gi hotel",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya ingin anda tunjukkan jalan ke hotel\n\nPecahan\n- sayo -> tiada dalam pangkalan data\n- nok -> hendak / nak\n- awok -> tiada dalam pangkalan data\n- tunjuk -> tiada dalam pangkalan data\n- jale -> jalan\n- gi -> pergi\n- hotel -> hotel\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 3,
+      "query": "sayo buleh pesey makaney loni",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya boleh pesan makanan sekarang\n\nPecahan\n- sayo -> tiada dalam pangkalan data\n- buleh -> boleh\n- pesey -> tiada dalam pangkalan data\n- makaney -> tiada dalam pangkalan data\n- loni -> sekarang / hari ini\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 4,
+      "query": "sayo nok gi pasagh loni",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya nak pergi ke pasar sekarang\n\nPecahan\n- sayo -> tiada dalam pangkalan data\n- nok -> hendak / nak\n- gi -> pergi\n- pasagh -> tiada dalam pangkalan data\n- loni -> sekarang / hari ini\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 0.8,
+      "ketepatan_maklumat": 0.6,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 5,
+      "query": "awok makey nasi dagang semale",
+      "jenis": "",
+      "answer": "Terjemahan\nAwak makan nasi dage semalam\n\nPecahan\n- awok -> tiada dalam pangkalan data\n- makey -> makan\n- nasi -> nasi\n- dagang -> dage\n- semale -> semalam\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 0.8,
+      "ketepatan_maklumat": 0.6,
+      "kerelevanan_jawapan": 0.9
+    },
+    {
+      "id": 6,
+      "query": "kat mano kawe buleh beli hadioh ole-ole?",
+      "jenis": "",
+      "answer": "Terjemahan\nDi mana saya boleh beli hadiah ole-ole\n\nPecahan\n- kat -> di / pada\n- mano -> mana\n- kawe -> saya / kami\n- buleh -> boleh\n- beli -> beli\n- hadioh -> hadiah / barangan\n- ole -> tiada dalam pangkalan data\n- ole -> tiada dalam pangkalan data\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 7,
+      "query": "kawe nok gi pasa male",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya hendak pergi ke pasar malam\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- gi -> pergi\n- pasa -> pasal / tentang\n- male -> malam\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 8,
+      "query": "kawe nok make nasi keghabu hok sedak",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya mahu makan Nasi Kerabu yang sedap\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- make -> makan\n- nasi -> nasi\n- keghabu -> kerabu\n- hok -> yang\n- sedak -> sedap / enak\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 0.8,
+      "ketepatan_maklumat": 0.9,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 9,
+      "query": "kawe nok beli kaing batik kelate",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya mahu beli kain batik kelantan\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- beli -> beli\n- kaing -> kaing\n- batik -> tiada dalam pangkalan data\n- kelate -> kelat\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 10,
+      "query": "kawe nok gi panta nok mandi",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya mahu pergi ke pantai untuk mandi\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- gi -> pergi\n- panta -> pantai\n- nok -> hendak / nak\n- mandi -> tiada dalam pangkalan data\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 11,
+      "query": "buleh ko kawe jale kaki gi situ?",
+      "jenis": "",
+      "answer": "Terjemahan\nBoleh ke saya jalan kaki pergi sana\n\nPecahan\n- buleh -> boleh\n- ko -> ke / tak\n- kawe -> saya / kami\n- jale -> jalan\n- kaki -> kaki\n- gi -> pergi\n- situ -> situ / di sana\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 12,
+      "query": "kawe nok beli kepok leko hok ori",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya ingin beli keropok lekor yang asli\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- beli -> beli\n- kepok -> keropok\n- leko -> lekor\n- hok -> yang\n- ori -> tiada dalam pangkalan data\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 13,
+      "query": "buleh tunjuk kat peta kawe duk mano?",
+      "jenis": "",
+      "answer": "Terjemahan\nBoleh tunjukkan di peta saya tinggal mana\n\nPecahan\n- buleh -> boleh\n- tunjuk -> tiada dalam pangkalan data\n- kat -> di / pada\n- peta -> kuat / gagah\n- kawe -> saya / kami\n- duk -> duduk / tinggal\n- mano -> mana\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.7,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 14,
+      "query": "kawe nok gi pasa siti khadijah",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya mahu pergi ke Pasar Siti Khadijah.\n\nPecahan\n- kawe -> saya / kami\n- nok -> hendak / nak\n- gi -> pergi\n- pasa -> pasal / tentang\n- siti -> tiada dalam pangkalan data\n- khadijah -> khadijoh\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 15,
+      "query": "sayo nok awok tunjuk lokasi hotel",
+      "jenis": "",
+      "answer": "Terjemahan\nSaya nak anda tunjuk lokasi hotel\n\nPecahan\n- sayo -> tiada dalam pangkalan data\n- nok -> hendak / nak\n- awok -> tiada dalam pangkalan data\n- tunjuk -> tiada dalam pangkalan data\n- lokasi -> tiada dalam pangkalan data\n- hotel -> hotel\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    }
+  ],
+  "KU-02": [
+    {
+      "id": 1,
+      "query": "saya nak awak tunjuk jalan ke pantai",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok mu cade jale gi pata\n\nPecahan\n- saya -> ambo\n- nak -> nok\n- awak -> mu\n- tunjuk -> tiada dalam pangkalan data\n- jalan -> jale\n- ke -> tiada dalam pangkalan data\n- pantai -> pata\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.7,
+      "kerelevanan_jawapan": 0.8
+    },
+    {
+      "id": 2,
+      "query": "saya nak awak tunjuk arah ke hotel",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok mu tunjuk aroh ke hotel\n\nPecahan\n- saya -> ambo\n- nak -> nok\n- awak -> mu\n- tunjuk -> tiada dalam pangkalan data\n- arah -> aroh\n- ke -> tiada dalam pangkalan data\n- hotel -> hotel\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.7,
+      "kerelevanan_jawapan": 0.8
+    },
+    {
+      "id": 3,
+      "query": "saya boleh pesan makanan sekarang",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nSayo boleh pese makane loni\n\nPecahan\n- saya -> ambo\n- boleh -> boleh\n- pesan -> pese\n- makanan -> makane\n- sekarang -> loni\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 4,
+      "query": "saya nak pergi ke pasar sekarang",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok gi pasar loni\n\nPecahan\n- saya -> ambo\n- nak -> nok\n- pergi -> gi\n- ke -> tiada dalam pangkalan data\n- pasar -> pasar\n- sekarang -> loni\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.7,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 5,
+      "query": "awak makan nasi dagang semalam",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAwok make nasi dage semale\n\nPecahan\n- awak -> mu\n- makan -> makеy\n- nasi -> nasi\n- dagang -> dage\n- semalam -> semale\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 6,
+      "query": "di mana saya boleh beli cenderamata?",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nKat mano ambo buleh beli cenderamata\n\nPecahan\n- di -> kat\n- mana -> mano\n- saya -> ambo\n- boleh -> boleh\n- beli -> beli\n- cenderamata -> cenderamata\n\nKeyakinan\nTinggi",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 7,
+      "query": "saya hendak pergi ke pasar malam",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok gi pasa male\n\nPecahan\n- saya -> ambo\n- hendak -> nok\n- pergi -> gi\n- ke -> tiada dalam pangkalan data\n- pasar -> pasar\n- malam -> male\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.7,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 8,
+      "query": "saya nak makan nasi kerabu yang sedap",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok makеy Nasi Kerabu ye sedak\n\nPecahan\n- saya -> ambo\n- nak -> nok\n- makan -> makеy\n- nasi -> nasi\n- kerabu -> kerabu\n- yang -> ye\n- sedap -> sedak\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 9,
+      "query": "saya mahu beli kain batik kelantan",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok beli kaing batik kelante\n\nPecahan\n- saya -> ambo\n- mahu -> nok\n- beli -> beli\n- kain -> kaing\n- batik -> tiada dalam pangkalan data\n- kelantan -> kelante\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 10,
+      "query": "saya hendak ke pantai untuk mandi-manda",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nKawe nok gi panta untok mando\n\nPecahan\n- saya -> ambo\n- hendak -> nok\n- ke -> tiada dalam pangkalan data\n- pantai -> pata\n- untuk -> untok\n- mandi -> tiada dalam pangkalan data\n- manda -> mando\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 11,
+      "query": "boleh ke saya jalan kaki ke sana?",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nBoleh ko kawe jale kaki gi sano?\n\nPecahan\n- boleh -> boleh\n- ke -> tiada dalam pangkalan data\n- saya -> ambo\n- jalan -> jale\n- kaki -> kaki\n- ke -> tiada dalam pangkalan data\n- sana -> sano\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 12,
+      "query": "saya hendak beli keropok lekor asli",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok beli kepok leko hok ori\n\nPecahan\n- saya -> ambo\n- hendak -> nok\n- beli -> beli\n- keropok -> keropok\n- lekor -> tiada dalam pangkalan data\n- asli -> tiada dalam pangkalan data\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 13,
+      "query": "boleh tolong tunjukkan kedudukan saya dalam peta?",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nBoleh tulong tunjukke keduduke ambo dale peto\n\nPecahan\n- boleh -> boleh\n- tolong -> tulong\n- tunjukkan -> tunjukke\n- kedudukan -> keduduke\n- saya -> ambo\n- dalam -> dale\n- peta -> peto\n\nKeyakinan\nRendah",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 14,
+      "query": "saya mahu pergi ke pasar siti khadijah",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nKawe nok gi pasa khadijoh\n\nPecahan\n- saya -> ambo\n- mahu -> nok\n- pergi -> gi\n- ke -> tiada dalam pangkalan data\n- pasar -> pasar\n- siti -> tiada dalam pangkalan data\n- khadijah -> khadijoh\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 15,
+      "query": "saya nak awak tunjuk lokasi hotel",
+      "jenis": "",
+      "answer": "Terjemahan Dialek Kelantan\nAmbo nok mu tunjuk lokasi hotel\n\nPecahan\n- saya -> ambo\n- nak -> nok\n- awak -> mu\n- tunjuk -> tiada dalam pangkalan data\n- lokasi -> tiada dalam pangkalan data\n- hotel -> hotel\n\nKeyakinan\nSederhana",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    }
+  ],
+  "KU-03": [
+    {
+      "id": 1,
+      "query": "Apakah ibu negeri Kelantan?",
+      "jenis": "Direct",
+      "answer": "Ibu negeri Kelantan ialah Kota Bharu.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 2,
+      "query": "Berapakah jajahan di Kelantan?",
+      "jenis": "Direct",
+      "answer": "Kelantan mempunyai 10 jajahan: Kota Bharu, Pasir Mas, Tumpat, Pasir Puteh, Bachok, Kuala Krai, Machang, Tanah Merah, Jeli dan Gua Musang.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 3,
+      "query": "Berapakah keluasan negeri Kelantan?",
+      "jenis": "Direct",
+      "answer": "Kelantan berkeluasan 15,099 kilometer persegi.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 4,
+      "query": "Apakah warna bendera Kelantan?",
+      "jenis": "Direct",
+      "answer": "Bendera Kelantan berwarna merah dengan gambar wau bulan dan bintang berwarna putih di bahagian tengah.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 5,
+      "query": "Cadangan makanan tradisional Kelantan",
+      "jenis": "Recommendation",
+      "answer": "Maklumat daripada pangkalan data JomKecek.\n\n- Nasi Kerabu Biru: nasi biru asli bunga telang dengan ulaman dan sambal kelapa.\n- Nasi Dagang Kelantan: nasi beras merah dikukus santan bersama gulai darat ikan tongkol.\n- Nasi Berlauk Ikan Tongkol: sarapan ruji kelantan dengan gulai kuning ikan yang kaya rasa.\n- Satay Lembu Kelantan: satay daging lembu dengan perapan rempah manis tradisional kelantan.",
+      "kerelevanan_konteks": 0.6,
+      "ketepatan_maklumat": 0.3,
+      "kerelevanan_jawapan": 0.7
+    },
+    {
+      "id": 6,
+      "query": "Tempat menarik di Kota Bharu",
+      "jenis": "Recommendation",
+      "answer": "Maklumat daripada pangkalan data JomKecek.\n\n- Pantai Cahaya Bulan: pantai ikonik kelantan; sesuai untuk riadah keluarga.\n- Masjid Muhammadi: masjid bersejarah dibina pada 1867 dengan seni bina unik.\n- Istana Balai Besar: istana diraja lama kesultanan kelantan yang megah.\n- Masjid Mukim Panji: masjid komuniti yang mempunyai hiasan dalaman yang menarik.",
+      "kerelevanan_konteks": 0.6,
+      "ketepatan_maklumat": 0.3,
+      "kerelevanan_jawapan": 0.7
+    },
+    {
+      "id": 7,
+      "query": "Apa budaya terkenal di Kelantan?",
+      "jenis": "Recommendation",
+      "answer": "Maklumat daripada pangkalan data JomKecek.\n\n- Wayang Kulit Kelantan: teater bayangan menggunakan patung kulit lembu dan iringan muzik gamelan.\n- Dikir Barat: persembahan berkumpulan yang menggabungkan nyanyian berbalas pantun dan gerakan tangan.\n- Mak Yong: drama tari tradisional yang menggabungkan unsur lakonan, dan muzik\n- Keris Tok Chu: seni pertukangan keris yang terkenal dengan kualiti besi dan hulu yang halus.",
+      "kerelevanan_konteks": 0.6,
+      "ketepatan_maklumat": 0.3,
+      "kerelevanan_jawapan": 0.4
+    },
+    {
+      "id": 8,
+      "query": "Senaraikan aktiviti menarik untuk pelancong di Kelantan",
+      "jenis": "Recommendation",
+      "answer": "Maklumat daripada pangkalan data JomKecek.\n\n- Pantai Cahaya Bulan: pantai ikonik kelantan; sesuai untuk riadah keluarga.\n- Masjid Muhammadi: masjid bersejarah dibina pada 1867 dengan seni bina unik.\n- Istana Balai Besar: istana diraja lama kesultanan kelantan yang megah.\n- Pusat Penerangan Pelancongan (tic): pusat maklumat utama bagi pelancong di kelantan.",
+      "kerelevanan_konteks": 0.6,
+      "ketepatan_maklumat": 0.3,
+      "kerelevanan_jawapan": 0.7
+    },
+    {
+      "id": 9,
+      "query": "Ceritakan tentang Wayang Kulit Kelantan",
+      "jenis": "Detail",
+      "answer": "Wayang Kulit Kelantan ialah seni persembahan tradisional yang menggunakan patung kulit lembu yang diukir halus, dipersembahkan dalam cerita epik Ramayana dan Mahabharata.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 10,
+      "query": "Terangkan tentang Mak Yong",
+      "jenis": "Detail",
+      "answer": "Mak Yong ialah drama tari tradisional yang menggabungkan unsur lakonan dan muzik. Ini merupakan persembahan penting di Kelantan yang melibatkan pelbagai elemen seni, termasuk pakaian tradisional, maklumat sejarah, dan cerita moral.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 11,
+      "query": "Huraikan tentang Dikir Barat",
+      "jenis": "Detail",
+      "answer": "Dikir barat adalah persembahan dikir yang mempunyai variasi dikir barat. Ia terdiri daripada beberapa elemen utama:\n\n1. Tempo: Dikir barat memiliki tempo yang perlahan, memberikan suasana yang tenang dan mendalam.\n2. Unsur nasihat agama: Persembahan ini mengandungi unsur-unsur nasihat agama yang membantu peserta memahami nilai-nilai moral dan spiritual.\n\nHuraian lebih lanjut:\n\nDikir barat adalah persembahan dikir yang popular di Kelantan, terutamanya dalam acara-acara tradisional. Ia merupakan variasi dari dikir barat biasa dengan beberapa ciri khas. Persembahannya melibatkan nyanyian berbalas pantun antara pelbagai penyanyi dan penggaulan gerakan tangan yang harmonis.\n\nPersembahan ini sering diadakan semasa perayaan tradisional atau acara sosial, di mana masyarakat dapat menghargai budaya dan nilai-nilai agama. Dengan tempo perlahan dan unsur nasihat agama, dikir barat memberikan pengalaman yang mendalam kepada pendengar, memungkinkan mereka untuk merasakan dan memahami makna pesan-pesan yang disampaikan melalui pantun-pantun tersebut.",
+      "kerelevanan_konteks": 0.8,
+      "ketepatan_maklumat": 0.6,
+      "kerelevanan_jawapan": 0.9
+    },
+    {
+      "id": 12,
+      "query": "Mengapakah Kelantan dipanggil Serambi Mekah?",
+      "jenis": "Reasoning",
+      "answer": "Gelaran 'Serambi Mekah' diberikan kepada Kelantan kerana negeri ini diiktiraf sebagai pusat kehidupan dan pengajian Islam yang kukuh di Malaysia.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 13,
+      "query": "Bagaimana songket Kelantan ditenun?",
+      "jenis": "Reasoning",
+      "answer": "Songket ialah kraftangan tradisional Kelantan yang menggunakan benang emas atau perak ditenun bersama kain sutera atau kapas, menghasilkan corak yang mewah dan indah.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 14,
+      "query": "Kenapa Kelantan terkenal dengan kraftangan tradisional?",
+      "jenis": "Reasoning",
+      "answer": "Kraftangan tradisional Kelantan yang terkenal termasuk songket (kain benang emas), batik kelantan, wau bulan, gasing, dan anyaman mengkuang.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 1.0,
+      "kerelevanan_jawapan": 1.0
+    },
+    {
+      "id": 15,
+      "query": "Bagaimanakah permainan gasing dimainkan?",
+      "jenis": "Reasoning",
+      "answer": "Permainan gasing adalah permainan tradisional yang sangat terkenal di Kelantan. Gasing Kelantan adalah antara yang terbesar di dunia dan boleh berputar sehingga berjam-jam.",
+      "kerelevanan_konteks": 1.0,
+      "ketepatan_maklumat": 0.8,
+      "kerelevanan_jawapan": 1.0
+    }
+  ]
+}
