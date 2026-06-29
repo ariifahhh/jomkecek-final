@@ -674,7 +674,16 @@ export default function HomePage() {
             <article className="landing-hero">
               <div>
                 <span className="eyebrow">Chatbot AI Kelantan</span>
-                <h2>Dialek, budaya, makanan dan pelancongan Kelantan dalam satu platform.</h2>
+                <h2 className="hero-heading">
+                  <span className="hero-gradient">Dialek</span> dan{" "}
+                  <span className="hero-gradient">pelancongan Kelantan</span>{" "}
+                  <span className="hero-typed">dalam satu platform.</span>
+                </h2>
+                <div className="hero-snippet">
+                  <span className="snippet-dialect">kawe nok make nasi keghabu</span>
+                  <span className="snippet-arrow">→</span>
+                  <span className="snippet-bm">saya mahu makan nasi kerabu</span>
+                </div>
                 <p>
                   JomKecek ialah chatbot berasaskan kecerdasan buatan yang khusus untuk negeri Kelantan.
                   Tanya soalan dalam dialek Kelantan atau Bahasa Melayu standard — JomKecek faham kedua-duanya
@@ -696,17 +705,17 @@ export default function HomePage() {
 
             <div className="landing-grid">
               <article>
-                <MessageCircle size={22} />
+                <div className="feature-icon feature-icon--dialect"><MessageCircle size={24} /></div>
                 <h3>Dialek Kelantan</h3>
                 <p>Terjemahkan perkataan dan ayat dialek Kelantan ke Bahasa Melayu standard — dan sebaliknya — dengan pecahan makna setiap perkataan.</p>
               </article>
               <article>
-                <Database size={22} />
+                <div className="feature-icon feature-icon--data"><Database size={24} /></div>
                 <h3>Pangkalan Data Tempatan</h3>
-                <p>{metrics?.documents ?? "-"} rekod merangkumi tempat menarik, makanan tradisional, budaya dan dialek Kelantan yang telah disahkan.</p>
+                <p>{metrics?.documents ?? "1,949"} rekod merangkumi tempat menarik, makanan tradisional, budaya dan dialek Kelantan yang telah disahkan.</p>
               </article>
               <article>
-                <ShieldCheck size={22} />
+                <div className="feature-icon feature-icon--rag"><ShieldCheck size={24} /></div>
                 <h3>Jawapan Berpandu Konteks</h3>
                 <p>Sistem RAG hibrid memastikan setiap jawapan bersumberkan data tempatan yang relevan, bukan tekaan semata-mata.</p>
               </article>

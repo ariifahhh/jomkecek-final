@@ -280,6 +280,63 @@ button {
   letter-spacing: -0.05em;
 }
 
+/* Gradient accent on hero heading keywords */
+.hero-gradient {
+  background: linear-gradient(135deg, var(--maroon), #c0392b, #8B1a1a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Typing animation for last phrase */
+@keyframes typing {
+  from { width: 0; opacity: 0; }
+  1% { opacity: 1; }
+  to { width: 100%; opacity: 1; }
+}
+@keyframes blink {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: var(--maroon); }
+}
+.hero-typed {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: typing 1.2s steps(22, end) 0.6s forwards;
+  border-right: 2px solid transparent;
+  animation: typing 1.2s steps(22, end) 0.6s forwards, blink 0.75s step-end 0.6s 4;
+}
+
+/* Translation snippet */
+.hero-snippet {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(110, 19, 15, 0.06);
+  border: 1px solid rgba(110, 19, 15, 0.14);
+  font-size: 14px;
+  font-weight: 600;
+}
+.snippet-dialect {
+  color: var(--maroon);
+  font-style: italic;
+}
+.snippet-arrow {
+  color: var(--muted);
+  font-weight: 400;
+}
+.snippet-bm {
+  color: var(--ink);
+}
+[data-theme="dark"] .hero-snippet {
+  background: rgba(200, 100, 80, 0.08);
+  border-color: rgba(200, 100, 80, 0.18);
+}
+
 .landing-hero p {
   max-width: 680px;
   margin: 0;
@@ -328,27 +385,37 @@ button {
 
 .landing-grid article {
   display: grid;
-  gap: 10px;
-  padding: 18px;
+  gap: 12px;
+  padding: 22px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
 
-.landing-grid svg {
-  color: var(--maroon);
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
 }
+.feature-icon--dialect { background: rgba(110, 19, 15, 0.1); color: var(--maroon); }
+.feature-icon--data    { background: rgba(73, 101, 79, 0.12); color: var(--green); }
+.feature-icon--rag     { background: rgba(181, 106, 63, 0.12); color: var(--clay); }
 
 .landing-grid h3 {
   margin: 0;
-  color: var(--maroon);
+  color: var(--ink);
+  font-size: 16px;
 }
 
 .landing-grid p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.55;
+  font-size: 14px;
 }
 
 .chat-panel,
