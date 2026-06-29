@@ -107,7 +107,7 @@ const navItems: Array<{ id: NavView; label: string; icon: typeof MessageCircle }
   { id: "landing", label: "Laman Utama", icon: Home },
   { id: "chat", label: "Chat", icon: MessageCircle },
   { id: "explore", label: "Pelancongan", icon: Compass },
-  { id: "history", label: "Sejarah", icon: Clock3 }
+  { id: "history", label: "Sejarah Perbualan", icon: Clock3 }
 ];
 
 const dialectPrompts = [
@@ -665,7 +665,7 @@ export default function HomePage() {
         <header className="topline">
           <div>
             <span className="eyebrow">JomKecek</span>
-            <h1>{view === "landing" ? "Tentang JomKecek." : view === "chat" ? "Kecek molek, jawab berpandu." : view === "explore" ? "Pelancongan Kelantan" : "Rekod Perbualan"}</h1>
+            <h1>{view === "landing" ? "Tentang JomKecek." : view === "chat" ? "Kecek molek, jawab berpandu." : view === "explore" ? "Pelancongan Kelantan" : "Rekod Sejarah Perbualan"}</h1>
           </div>
         </header>
 
