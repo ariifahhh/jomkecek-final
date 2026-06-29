@@ -151,7 +151,7 @@ def build_tourism_items(query: str, hits) -> list[dict[str, Any]]:
             continue
         seen.add(key)
         items.append(item)
-        if len(items) == 4:
+        if len(items) == 3:
             break
     return items
 
@@ -200,7 +200,7 @@ def _is_specific_item_query(query: str) -> bool:
     return len(specific) >= 3  # has 3+ specific non-general words = likely specific item
 
 
-def _merge_with_top(top_items: list, hit_items: list, total: int = 4) -> list:
+def _merge_with_top(top_items: list, hit_items: list, total: int = 3) -> list:
     """Merge top-by-row items first, then fill with retrieval hits, deduplicating."""
     seen = {item["name"].lower() for item in top_items}
     result = list(top_items)
@@ -375,9 +375,9 @@ def generate_answer_by_type(query: str, hits, route: dict[str, Any], answer_type
     if answer_type == "recommendation":
         items = build_tourism_items(query, hits)
         if not items:
-            items = [_item_from_doc(hit) for hit in hits[:4]]
+            items = [_item_from_doc(hit) for hit in hits[:3]]
         lines = ["Cadangan:"]
-        for i, item in enumerate(items[:4], start=1):
+        for i, item in enumerate(items[:3], start=1):
             lines.append(f"{i}. {item['name']}\n{item['description']}")
         return "\n\n".join(lines)
 
@@ -511,7 +511,7 @@ def answer_kelantan(query: str, hits, route: dict[str, Any], answer_type: str) -
 
             # Always lead with top-3 most popular (by row order in Excel), then fill with retrieval hits
             top_items = _top_items_by_row(intent, limit=3)
-            items = _merge_with_top(top_items, hit_items, total=4)
+            items = _merge_with_top(top_items, hit_items, total=3)
 
             if items:
                 return {
@@ -757,7 +757,7 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
                 }
                 for hit in hits[:6]
             ],
-            "visual_keywords": [item["name"] + " Kelantan" for item in result["kelantan"].get("items", [])[:4]],
+            "visual_keywords": [item["name"] + " Kelantan" for item in result["kelantan"].get("items", [])[:3]],
             "route": route,
             "answer_type": answer_type,
         }

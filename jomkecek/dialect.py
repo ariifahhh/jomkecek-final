@@ -124,6 +124,10 @@ _BM_TO_KELANTAN_CORE: dict[str, str] = {
     "cenderamata": "cenderamato",
     "dikir": "dikir",
     "beli": "beli",
+    "pesan": "pese",
+    "makanan": "makane",
+    "pedas": "pedah",
+    "sangat": "do'oh",
 }
 
 # Core Kelantan→BM vocabulary — takes priority over Excel for these basic words
@@ -220,6 +224,15 @@ _KELANTAN_TO_BM_CORE: dict[str, str] = {
     "molek": "cantik / elok",
     "hok": "yang",
     "pasa": "pasal / tentang",
+    # --- perkataan dari ayat ujian ---
+    "sayo": "saya",
+    "awok": "awak / kamu",
+    "pese": "pesan",
+    "pesey": "pesan",
+    "makane": "makanan",
+    "pedah": "pedas",
+    "do'oh": "sangat / betul-betul",
+    "tunjuk": "tunjuk / tunjukkan",
 }
 
 SUFFIX_RULES: list[tuple[str, str]] = [
