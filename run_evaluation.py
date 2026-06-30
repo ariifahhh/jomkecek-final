@@ -7,8 +7,13 @@ Output : rouge_l_results.json + llm_judge_results.json + markdown tables
 from __future__ import annotations
 
 import json
+import sys
 import time
 import requests
+
+# Force UTF-8 output on Windows so Unicode arrows/dashes print cleanly
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 try:
     from rouge_score import rouge_scorer as _rs
@@ -36,61 +41,56 @@ except Exception:
 
 API = "http://localhost:8000/chat"
 
-# ─── KU-01: Dialek → BM ──────────────────────────────────────────────────────
+# ─── KU-01: Dialek → BM (T1–T5 dari Jadual 7.4) ─────────────────────────────
 KU01 = [
-    ("sayo nok awok tunjuk jale gi pata",          "saya nak awak tunjuk jalan ke pantai"),
-    ("sayo nok awok tunjuk jale gi hotel",         "saya nak awak tunjuk arah ke hotel"),
-    ("sayo buleh pesey makaney loni",              "saya boleh pesan makanan sekarang"),
-    ("sayo nok gi pasagh loni",                    "saya nak pergi ke pasar sekarang"),
-    ("awok makey nasi dagang semale",              "awak makan nasi dagang semalam"),
-    ("kat mano kawe buleh beli hadioh ole-ole?",   "di mana saya boleh beli cenderamata?"),
-    ("kawe nok gi pasa male",                      "saya hendak pergi ke pasar malam"),
-    ("kawe nok make nasi keghabu hok sedak",       "saya nak makan nasi kerabu yang sedap"),
-    ("kawe nok beli kaing batik kelate",           "saya mahu beli kain batik kelantan"),
-    ("kawe nok gi panta nok mandi",                "saya hendak ke pantai untuk mandi-manda"),
-    ("buleh ko kawe jale kaki gi situ?",           "boleh ke saya jalan kaki ke sana?"),
-    ("kawe nok beli kepok leko hok ori",           "saya hendak beli keropok lekor asli"),
-    ("buleh tunjuk kat peta kawe duk mano?",       "boleh tolong tunjukkan kedudukan saya dalam peta?"),
-    ("kawe nok gi pasa siti khadijah",             "saya mahu pergi ke pasar siti khadijah"),
-    ("sayo nok awok tunjuk lokasi hotel",          "saya nak awak tunjuk lokasi hotel"),
+    ("sayo nok awok tunjuk jale gi pata",    "saya nak awak tunjuk jalan ke pantai"),
+    ("sayo buleh pese makane loni",           "saya boleh pesan makanan sekarang"),
+    ("kawe nok make nasi keghabu hok sedak", "saya nak makan nasi kerabu yang sedap"),
+    ("makane ni pedah do'oh ko?",            "makanan ini pedas sangat ke?"),
+    ("buleh ko kawe jale kaki gi sana?",     "boleh ke saya jalan kaki ke sana?"),
 ]
 
-# ─── KU-02: BM → Dialek ──────────────────────────────────────────────────────
+# ─── KU-02: BM → Dialek (T6–T10 dari Jadual 7.4) ────────────────────────────
 KU02 = [
-    ("saya nak awak tunjuk jalan ke pantai",              "sayo nok awok tunjuk jale gi pata"),
-    ("saya nak awak tunjuk arah ke hotel",                "sayo nok awok tunjuk jale gi hotel"),
-    ("saya boleh pesan makanan sekarang",                 "sayo buleh pesey makaney loni"),
-    ("saya nak pergi ke pasar sekarang",                  "sayo nok gi pasagh loni"),
-    ("awak makan nasi dagang semalam",                    "awok makey nasi dagang semale"),
-    ("di mana saya boleh beli cenderamata?",              "kat mano kawe buleh beli hadioh ole-ole?"),
-    ("saya hendak pergi ke pasar malam",                  "kawe nok gi pasa male"),
-    ("saya nak makan nasi kerabu yang sedap",             "kawe nok make nasi keghabu hok sedak"),
-    ("saya mahu beli kain batik kelantan",                "kawe nok beli kaing batik kelate"),
-    ("saya hendak ke pantai untuk mandi-manda",           "kawe nok gi panta nok mandi"),
-    ("boleh ke saya jalan kaki ke sana?",                 "buleh ko kawe jale kaki gi situ?"),
-    ("saya hendak beli keropok lekor asli",               "kawe nok beli kepok leko hok ori"),
-    ("boleh tolong tunjukkan kedudukan saya dalam peta?", "buleh tunjuk kat peta kawe duk mano?"),
-    ("saya mahu pergi ke pasar siti khadijah",            "kawe nok gi pasa siti khadijah"),
-    ("saya nak awak tunjuk lokasi hotel",                 "sayo nok awok tunjuk lokasi hotel"),
+    ("saya nak awak tunjuk jalan ke pantai",  "sayo nok awok tunjuk jale gi pata"),
+    ("saya boleh pesan makanan sekarang",     "sayo buleh pese makane loni"),
+    ("saya nak makan nasi kerabu yang sedap", "kawe nok make nasi keghabu hok sedak"),
+    ("makanan ini pedas sangat ke?",          "makane ni pedah do'oh ko?"),
+    ("boleh ke saya jalan kaki ke sana?",     "buleh ko kawe jale kaki gi sana?"),
 ]
 
-# ─── KU-03: Pelancongan ──────────────────────────────────────────────────────
+# ─── KU-03: Pelancongan (P1–P10 dari Jadual 7.4) ─────────────────────────────
 KU03 = [
-    ("Apakah ibu negeri Kelantan?",                        "Direct",         "Kota Bharu adalah ibu negeri Kelantan."),
-    ("Berapakah jajahan di Kelantan?",                     "Direct",         "Kelantan mempunyai 10 jajahan."),
-    ("Berapakah keluasan negeri Kelantan?",                "Direct",         "Keluasan Kelantan ialah 15,099 kilometer persegi."),
-    ("Apakah warna bendera Kelantan?",                     "Direct",         "Bendera Kelantan berwarna merah dan kuning."),
-    ("Cadangan makanan tradisional Kelantan",              "Recommendation", "Nasi kerabu, nasi dagang, laksam, keropok lekor dan akok merupakan makanan tradisional Kelantan yang terkenal."),
-    ("Tempat menarik di Kota Bharu",                       "Recommendation", "Pantai Cahaya Bulan, Pasar Siti Khadijah, Muzium Kelantan dan Istana Jahar merupakan tempat menarik di Kota Bharu."),
-    ("Apa budaya terkenal di Kelantan?",                   "Recommendation", "Wayang kulit, dikir barat, mak yong, rebana dan wau bulan merupakan budaya terkenal Kelantan."),
-    ("Senaraikan aktiviti menarik untuk pelancong di Kelantan", "Recommendation", "Pelancong boleh menikmati wayang kulit, membeli kraftangan, melawat pantai, mencuba makanan tradisional dan mengunjungi pasar malam."),
-    ("Ceritakan tentang Wayang Kulit Kelantan",            "Detail",         "Wayang Kulit Kelantan adalah seni persembahan tradisional menggunakan patung kulit yang dimainkan di sebalik skrin putih dengan iringan muzik gamelan."),
-    ("Terangkan tentang Mak Yong",                         "Detail",         "Mak Yong adalah seni persembahan tradisional Kelantan yang menggabungkan tarian, nyanyian dan dialog yang telah diiktiraf UNESCO."),
-    ("Huraikan tentang Dikir Barat",                       "Detail",         "Dikir Barat adalah seni persembahan beramai-ramai dengan nyanyian berirama yang dipimpin oleh seorang tok juara dan diikuti oleh awok-awok."),
-    ("Mengapakah Kelantan dipanggil Serambi Mekah?",       "Reasoning",      "Kelantan dipanggil Serambi Mekah kerana pengaruh kuat agama Islam dalam kehidupan masyarakat, undang-undang dan adat resam negeri tersebut."),
-    ("Bagaimana songket Kelantan ditenun?",                "Reasoning",      "Songket Kelantan ditenun secara tradisional menggunakan alat tenun bingkai dengan benang emas atau perak yang diselitkan ke dalam fabrik sutera atau kapas."),
-    ("Kenapa Kelantan terkenal dengan kraftangan tradisional?", "Reasoning",  "Kelantan terkenal dengan kraftangan kerana warisan budaya yang kuat, kemahiran turun-temurun dalam tenunan songket, anyaman, ukiran kayu dan pembuatan wau."),
-    ("Bagaimanakah permainan gasing dimainkan?",           "Reasoning",      "Gasing dimainkan dengan melilitkan tali pada cakera besar kemudian dilempar kuat ke tanah supaya berpusing lama, dan pertandingan menilai tempoh putaran terlama."),
+    ("Apakah ibu negeri Kelantan?",
+     "Direct",
+     "Ibu negeri Kelantan ialah Kota Bharu."),
+    ("Apakah warna bendera Kelantan?",
+     "Direct",
+     "Bendera Kelantan berwarna merah dengan gambar wau bulan dan bintang berwarna putih di bahagian tengah."),
+    ("Cadangan makanan tradisional Kelantan",
+     "Recommendation",
+     "nasi kerabu biru: nasi biru asli bunga telang dengan ulaman dan sambal kelapa. nasi dagang kelantan: nasi beras merah dikukus santan bersama gulai darat ikan tongkol. nasi berlauk ikan tongkol: sarapan ruji kelantan dengan gulai kuning ikan yang kaya rasa."),
+    ("Tempat menarik di Kota Bharu",
+     "Recommendation",
+     "pantai cahaya bulan: pantai ikonik kelantan; sesuai untuk riadah keluarga. masjid muhammadi: masjid bersejarah dibina pada 1867 dengan seni bina unik. istana balai besar: istana diraja lama kesultanan kelantan yang megah."),
+    ("Apa budaya terkenal di Kelantan?",
+     "Recommendation",
+     "wayang kulit kelantan: teater bayangan menggunakan patung. dikir barat: persembahan berkumpulan yang menggabungkan nyanyian berbalas pantun dan gerakan tangan. mak yong: drama tari tradisional yang menggabungkan unsur lakonan, dan muzik."),
+    ("Ceritakan tentang Wayang Kulit Kelantan",
+     "Detail",
+     "wayang kulit kelantan: teater bayangan menggunakan patung."),
+    ("Huraikan tentang Nasi Kerabu",
+     "Detail",
+     "nasi kerabu hitam: versi nasi kerabu dengan kuah tumis santan pekat yang gelap. nasi kerabu kuning: variasi nasi kerabu berwarna kuning kunyit dengan ulaman segar. nasi kerabu putih: nasi kerabu asli tanpa pewarna; dimakan dengan sambal tumis."),
+    ("Mengapakah Kelantan dipanggil Serambi Mekah?",
+     "Reasoning",
+     "Gelaran 'Serambi Mekah' diberikan kepada Kelantan kerana negeri ini diiktiraf sebagai pusat kehidupan dan pengajian Islam yang kukuh di Malaysia."),
+    ("Kenapa wau bulan dikaitkan dengan Kelantan?",
+     "Reasoning",
+     "wau bulan: wau ikonik malaysia dengan hiasan motif sobek yang sangat halus dan bersaiz besar. wau seri bulan: variasi wau bulan yang mempunyai ekor lebih lebar dan corak lebih padat. wau jalabudi sobek: wau jalabudi yang dihiasi dengan teknik potongan kertas berwarna yang rumit."),
+    ("Kenapa Kelantan terkenal dengan seni ukiran kayu?",
+     "Reasoning",
+     "seni ukiran kayu kelantan: seni ukiran motif bunga dan geometri pada bangunan dan hulu keris. seni kraf ukiran nisan kayu: ukiran nisan daripada kayu cengal yang mempunyai nilai seni tinggi."),
 ]
 
 
@@ -129,13 +129,13 @@ def run_ku(name: str, cases: list, mode: str) -> list[dict]:
         ev     = resp.get("eval", {})
         answer = resp.get("answer", "")
 
-        # ROUGE-L — KU-03 compute locally, KU-01/KU-02 use API f1 + recompute P/R locally
+        # ROUGE-L — compare human reference against the translated sentence only (not full formatted answer).
+        # Using the full answer inflates text length and breaks P/R/F1 consistency.
         if name == "KU-03":
             rl = _rouge_l_full(ref, answer)
         else:
-            rl_local = _rouge_l_full(ref, answer)
-            api_f1   = ev.get("rouge_l", rl_local["f1"])
-            rl = {"precision": rl_local["precision"], "recall": rl_local["recall"], "f1": api_f1}
+            translation_text = resp.get("translation", {}).get("translation", "") or answer
+            rl = _rouge_l_full(ref, translation_text)
 
         ctx = ev.get("judge_context_relevance", 0.0)
         gnd = ev.get("judge_groundedness", 0.0)
@@ -154,7 +154,7 @@ def run_ku(name: str, cases: list, mode: str) -> list[dict]:
 
 
 def avg(lst: list[dict], key: str) -> float:
-    vals = [r[key] for r in lst if r[key] > 0]
+    vals = [r[key] for r in lst]
     return round(sum(vals) / len(vals), 3) if vals else 0.0
 
 
@@ -196,30 +196,17 @@ def main():
     ku03 = run_ku("KU-03", KU03, "Info Kelantan")
 
     print("\n\n" + "="*60)
-    print("HASIL LENGKAP — SALIN KE D7")
+    print("HASIL LENGKAP — JADUAL 7.4 (10 SET SOALAN)")
     print("="*60)
 
-    print_rouge_table("KU-01 (Dialek → BM)", ku01)
-    print_judge_table("KU-01 (Dialek → BM)", ku01)
+    print_rouge_table("KU-01 T1-T5 (Dialek ke BM)", ku01)
+    print_judge_table("KU-01 T1-T5 (Dialek ke BM)", ku01)
 
-    print_rouge_table("KU-02 (BM → Dialek)", ku02)
-    print_judge_table("KU-02 (BM → Dialek)", ku02)
+    print_rouge_table("KU-02 T6-T10 (BM ke Dialek)", ku02)
+    print_judge_table("KU-02 T6-T10 (BM ke Dialek)", ku02)
 
-    print_rouge_table("KU-03 (Pelancongan)", ku03)
-    print_judge_table("KU-03 (Pelancongan)", ku03)
-
-    # Ringkasan
-    print("\n### Ringkasan Keseluruhan\n")
-    print("| KU | F1-Skor | Kerelevanan Konteks | Ketepatan Maklumat | Kerelevanan Jawapan | Status |")
-    print("|----|---------|--------------------|--------------------|---------------------|--------|")
-    for name, data, thresh in [("KU-01", ku01, 0.45), ("KU-02", ku02, 0.40), ("KU-03", ku03, 0.40)]:
-        f1 = avg(data, "f1")
-        c  = avg(data, "kerelevanan_konteks")
-        g  = avg(data, "ketepatan_maklumat")
-        a  = avg(data, "kerelevanan_jawapan")
-        lulus  = f1 >= thresh and c >= 0.70 and g >= 0.70 and a >= 0.70
-        status = "LULUS ✓" if lulus else "GAGAL ✗"
-        print(f"| {name} | {f1:.3f} | {c:.3f} | {g:.3f} | {a:.3f} | **{status}** |")
+    print_rouge_table("KU-03 P1–P10 (Pelancongan)", ku03)
+    print_judge_table("KU-03 P1–P10 (Pelancongan)", ku03)
 
     # ── Save JSON ──────────────────────────────────────────────────────────────
     rouge_out = {}

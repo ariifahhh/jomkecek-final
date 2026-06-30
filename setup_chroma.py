@@ -44,7 +44,6 @@ def main() -> None:
         if doc.collection in TARGET_COLLECTIONS:
             by_collection.setdefault(doc.collection, []).append(doc)
 
-    total = sum(len(v) for v in by_collection.items())
     print(f"Found {len(docs)} total docs — {sum(len(v) for v in by_collection.values())} in target collections")
 
     print(f"Loading embedding model: {EMBED_MODEL}")

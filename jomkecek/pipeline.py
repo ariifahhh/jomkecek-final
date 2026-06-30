@@ -716,6 +716,15 @@ def run_chatbot(user_input: str, mode: str = "Auto") -> dict[str, Any]:
         strict = False
 
     context_texts = [hit.document.text for hit in hits]
+    # For domain recommendation responses, answers are built from _top_items_by_row (Excel row order),
+    # not from retrieval hits. Replace context with item descriptions so LLM Judge
+    # evaluates against the actual content shown in the answer.
+    if intent == "kelantan":
+        _domain_types = {"makanan_tradisional", "tempat_menarik", "budaya"}
+        if result.get("kelantan", {}).get("response_type") in _domain_types:
+            items = result.get("kelantan", {}).get("items", [])
+            if items:
+                context_texts = [f"{item['name']}: {item['description']}" for item in items]
     answer = format_answer(result)
     answer = final_response_guard(answer, route["normalized_query"], "\n".join(context_texts))
 

@@ -51,7 +51,6 @@ ENGLISH_REPLACEMENTS = {
     "source": "sumber",
     "context": "konteks",
     "makanan_tradisional": "makanan",
-    "budaya": "budaya",
     "history": "sejarah",
     "direct": "langsung",
     "reasoning": "penaakulan",
