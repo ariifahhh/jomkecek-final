@@ -93,7 +93,7 @@ type Metrics = {
 type CatalogItem = {
   id: string;
   name: string;
-  collection: "tourism" | "food" | "culture";
+  collection: "tempat_menarik" | "makanan_tradisional" | "budaya";
   category: string;
   district?: string;
   description: string;
