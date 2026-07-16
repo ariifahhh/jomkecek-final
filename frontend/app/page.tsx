@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" };
 
 type View = "chat" | "explore" | "history";
 
@@ -462,7 +463,7 @@ export default function HomePage() {
 
 
   const fetchMetrics = () => {
-    fetch(`${API_BASE}/metrics`)
+    fetch(`${API_BASE}/metrics`, { headers: NGROK_HEADERS })
       .then((r) => r.json())
       .then((data) => { if (typeof data.documents === "number") setMetrics(data); })
       .catch(() => {});
@@ -471,7 +472,7 @@ export default function HomePage() {
   useEffect(() => { fetchMetrics(); }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE}/catalog`)
+    fetch(`${API_BASE}/catalog`, { headers: NGROK_HEADERS })
       .then((response) => response.json())
       .then((data) => setCatalog(data.items || []))
       .catch(() => setCatalog([]));
@@ -539,7 +540,7 @@ export default function HomePage() {
       missing.map((item) =>
         fetch(`${API_BASE}/images`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...NGROK_HEADERS },
           body: JSON.stringify({ keywords: [item.image_keyword], limit_per_keyword: 1 })
         })
           .then((response) => response.json())
@@ -586,7 +587,7 @@ export default function HomePage() {
     try {
       const response = await fetch(`${API_BASE}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...NGROK_HEADERS },
         body: JSON.stringify({ message: cleanPrompt, mode: nextMode })
       });
 
