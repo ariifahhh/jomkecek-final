@@ -110,6 +110,12 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
+.mobile-menu-btn,
+.mobile-close-btn,
+.mobile-nav-backdrop {
+  display: none;
+}
+
 .brand img {
   width: 54px;
   height: 54px;
@@ -1744,6 +1750,106 @@ button {
 
   .message-body {
     max-width: calc(100vw - 88px);
+  }
+
+  /* Chat-mode fixed-viewport layout breaks once the sidebar stacks above
+     the main column — let the page scroll normally instead of forcing
+     everything into one screen height. */
+  .jk-shell.chat-mode {
+    height: auto;
+    overflow: visible;
+  }
+
+  .jk-shell.chat-mode .jk-main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .jk-shell.chat-mode .chat-panel {
+    height: auto;
+  }
+
+  .chat-panel {
+    min-height: 60vh;
+  }
+
+  .chat-panel .messages {
+    max-height: 60vh;
+  }
+
+  .jk-shell.chat-mode .insight-panel {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  /* Hamburger drawer nav — small screens only (phone / minimized window).
+     Tablets in landscape and larger keep the stacked top-row nav. */
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 50;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .mobile-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .jk-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 45;
+    width: 270px;
+    max-width: 82vw;
+    height: 100vh;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.24s ease;
+    box-shadow: var(--shadow);
+    border-right: 1px solid var(--line);
+  }
+
+  .jk-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .jk-sidebar nav {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-nav-backdrop.mobile-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(20, 12, 8, 0.45);
+  }
+
+  /* Room for the fixed hamburger button so it doesn't cover the title */
+  .jk-main,
+  .jk-shell.chat-mode .jk-main {
+    padding-top: 58px;
   }
 }
 

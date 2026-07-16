@@ -16,6 +16,7 @@ import {
   Lightbulb,
   Loader2,
   MapPinned,
+  Menu,
   MessageCircle,
   Moon,
   RotateCcw,
@@ -25,7 +26,8 @@ import {
   Sparkles,
   Sun,
   UtensilsCrossed,
-  User
+  User,
+  X
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
@@ -446,6 +448,7 @@ export default function HomePage() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPrompts, setShowPrompts] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
@@ -627,19 +630,41 @@ export default function HomePage() {
 
   return (
     <main className={`jk-shell${view === "chat" ? " chat-mode" : ""}`}>
-      <aside className="jk-sidebar">
+      {!mobileNavOpen && (
+        <button
+          className="mobile-menu-btn"
+          type="button"
+          aria-label="Buka menu"
+          onClick={() => setMobileNavOpen(true)}
+        >
+          <Menu size={22} />
+        </button>
+      )}
+      <div
+        className={`mobile-nav-backdrop${mobileNavOpen ? " mobile-open" : ""}`}
+        onClick={() => setMobileNavOpen(false)}
+      />
+      <aside className={`jk-sidebar${mobileNavOpen ? " mobile-open" : ""}`}>
         <div className="brand">
           <img src="/kijang_bukamata.png" alt="" />
           <div>
             <strong>JomKecek</strong>
             <span>Panduan AI Kelantan</span>
           </div>
+          <button
+            className="mobile-close-btn"
+            type="button"
+            aria-label="Tutup menu"
+            onClick={() => setMobileNavOpen(false)}
+          >
+            <X size={20} />
+          </button>
         </div>
         <nav>
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <button className={view === item.id ? "active" : ""} key={item.id} type="button" onClick={() => { setView(item.id); if (item.id === "chat") setMode("Terjemahan Dialek"); }}>
+              <button className={view === item.id ? "active" : ""} key={item.id} type="button" onClick={() => { setView(item.id); if (item.id === "chat") setMode("Terjemahan Dialek"); setMobileNavOpen(false); }}>
                 <Icon size={18} />
                 {item.label}
               </button>
