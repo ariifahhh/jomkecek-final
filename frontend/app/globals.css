@@ -1684,6 +1684,26 @@ button {
   box-shadow: 0 14px 32px rgba(73, 35, 24, 0.20);
 }
 
+/* Desktop/laptop screens render a touch large at 100% browser zoom —
+   scale the whole app down so users don't need to manually zoom out.
+   Applied to html (not .jk-shell) so vh/vw units recompute against the
+   zoomed viewport, matching real browser zoom instead of leaving a
+   blank gap at the bottom of the screen. */
+@media (min-width: 1121px) {
+  html {
+    zoom: 0.75;
+  }
+
+  /* CSS zoom scales rendered boxes but 100vh still resolves against the
+     real (unzoomed) viewport height, so fixed-height chat-mode layout
+     would otherwise leave a blank gap at the bottom of the screen.
+     Inflate by 1/0.75 so the zoomed result fills the visible window. */
+  .jk-shell.chat-mode,
+  .jk-shell.chat-mode .jk-main {
+    height: 133.34vh;
+  }
+}
+
 @media (max-width: 1120px) {
   .jk-shell {
     grid-template-columns: 1fr;
