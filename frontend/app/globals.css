@@ -1871,6 +1871,17 @@ button {
   .jk-shell.chat-mode .jk-main {
     padding-top: 58px;
   }
+
+  /* Match the dark-mode toggle to the nav buttons above it in the drawer —
+     on desktop it's a smaller secondary control, but stacked in the mobile
+     drawer list it looked out of place next to the main nav items. */
+  .sidebar-dark-toggle {
+    min-height: 46px;
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 750;
+  }
 }
 
 /* ── Tips Terjemahan Panel ── */
